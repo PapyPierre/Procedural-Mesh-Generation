@@ -443,28 +443,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 11c212ed4c69c744d80ccf600bb3bc85, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showGizmos: 1
-  islandSeed: 2281475
-  customIslandSeed: 0
   randomSpeed: 1
-  floorCount: 5
+  customIslandSeed: 0
+  islandSeed: 3630048
+  floorCount: 2
+  minFloorsHeight: 1
+  maxFloorsHeight: 4
+  minFloorsRadius: 4
+  maxFloorsRadius: 12.42
+  floorsMaxOffset: 2
+  upwardSwelling: 0.2
+  upwardSwellingPow: 1.1
+  meshComplexity: 6
+  hideAllGizmos: 0
+  showCenterLine: 1
+  showIslandSpine: 0
+  showFloorsRadius: 0
   floorColorGradient:
     serializedVersion: 2
-    key0: {r: 0, g: 1, b: 0.52039003, a: 1}
-    key1: {r: 0.20572257, g: 1, b: 0.033229858, a: 1}
-    key2: {r: 1, g: 0.8192897, b: 0.0071069547, a: 0}
-    key3: {r: 1, g: 0, b: 0.19670773, a: 0}
-    key4: {r: 1, g: 0, b: 0.8378444, a: 0}
-    key5: {r: 0, g: 0, b: 0, a: 0}
-    key6: {r: 0, g: 0, b: 0, a: 0}
+    key0: {r: 0, g: 0.18730974, b: 1, a: 1}
+    key1: {r: 0, g: 1, b: 0.8638129, a: 1}
+    key2: {r: 0.12831691, g: 0.97741944, b: 0.034442205, a: 0}
+    key3: {r: 1, g: 0.7403746, b: 0.06666666, a: 0}
+    key4: {r: 1, g: 0, b: 0.19670773, a: 0}
+    key5: {r: 0.84377575, g: 0, b: 1, a: 0}
+    key6: {r: 1, g: 0, b: 0.8378444, a: 0}
     key7: {r: 0, g: 0, b: 0, a: 0}
     ctime0: 0
-    ctime1: 14071
-    ctime2: 27563
-    ctime3: 49344
-    ctime4: 65535
-    ctime5: 0
-    ctime6: 0
+    ctime1: 10794
+    ctime2: 23708
+    ctime3: 35659
+    ctime4: 52043
+    ctime5: 65535
+    ctime6: 65535
     ctime7: 0
     atime0: 0
     atime1: 65535
@@ -475,20 +486,52 @@ MonoBehaviour:
     atime6: 0
     atime7: 0
     m_Mode: 0
-    m_NumColorKeys: 5
+    m_NumColorKeys: 6
     m_NumAlphaKeys: 2
-  minFloorsHeight: 6
-  maxFloorsHeight: 25
-  minFloorsRadius: 6
-  maxFloorsRadius: 15
-  floorsMaxOffset: 10
-  upwardSwelling: 1
-  upwardSwellingPow: 1.1
-  verticesPerFloor: 4
-  minVerticesSpacing: 1
-  maxVerticesSpacing: 10
-  verticesGizmosSize: 0.6
-  verticesGizmosColor: {r: 1, g: 1, b: 1, a: 1}
+  showFloorLabels: 1
+  showVertices: 1
+  verticesGizmosSize: 0.04
+  showVerticesLabels: 0
+  tipGizmosColor: {r: 0.457057, g: 0, b: 1, a: 1}
+  showVerticesLinks: 1
+  verticesLinksThickness: 1
+  _floors:
+  - index: 0
+    anchorPos: {x: 0.94850755, y: 0, z: 1.071677}
+    radius: 4.860766
+    color: {r: 0, g: 0.18730974, b: 1, a: 1}
+    verticesCount: 6
+    vertices:
+    - index: 0
+      position: {x: 3.4202137, y: -0.22647227, z: 1.7209032}
+    - index: 1
+      position: {x: 3.5306149, y: -0.16087465, z: -1.33915}
+    - index: 2
+      position: {x: 0.5080102, y: -0.4303582, z: -0.1911155}
+    - index: 3
+      position: {x: -0.016183078, y: -0.67277455, z: -0.13120723}
+    - index: 4
+      position: {x: 0.3828203, y: -1.7228793, z: 0.68071926}
+    - index: 5
+      position: {x: -2.863063, y: -1.868998, z: 1.0096545}
+  - index: 1
+    anchorPos: {x: 0.18776011, y: -1.8898343, z: 0.19979644}
+    radius: 0.8816528
+    color: {r: 0.7890996, g: 0.79772675, b: 0.058870077, a: 1}
+    verticesCount: 6
+    vertices:
+    - index: 0
+      position: {x: -0.38723624, y: -3.9666147, z: 0.26314777}
+    - index: 1
+      position: {x: 0.64562005, y: -3.106779, z: 0.47548348}
+    - index: 2
+      position: {x: 0.43803513, y: -3.626997, z: 0.2719513}
+    - index: 3
+      position: {x: 0.61666393, y: -2.9681504, z: 0.20233005}
+    - index: 4
+      position: {x: -0.46220034, y: -3.2527912, z: 0.09738201}
+    - index: 5
+      position: {x: -0.378499, y: -3.5934072, z: 0.13660774}
 --- !u!4 &1074025349
 Transform:
   m_ObjectHideFlags: 0
