@@ -86,11 +86,11 @@ public class IslandMeshGenerator : MonoBehaviour
 
     #region Hidden Fields
 
-    [SerializeField] private List<Floor> _floors = new List<Floor>();
-    private Vertex centerVertex;
-    private Vertex tipVertex;
-    private List<Vector3> islandVertices;
-    private List<int> islandTriangles;
+    private List<Floor> _floors = new List<Floor>();
+    private Vector3 centerVertex;
+    private Vector3 tipVertex;
+    [SerializeField] private List<Vector3> islandVertices = new List<Vector3>();
+    private List<int> islandTriangles = new List<int>();
     private Mesh islandMesh;
     private MeshFilter islandMeshFilter;
 
@@ -102,16 +102,17 @@ public class IslandMeshGenerator : MonoBehaviour
         islandMeshFilter = GetComponent<MeshFilter>();
         islandMeshFilter.mesh = null;
 
-        if (randomSpeed) islandSeed = (uint)Random.Range(0, 9999999);
+        if (randomSpeed) islandSeed = (uint) Random.Range(0, 9999999);
         else islandSeed = customIslandSeed;
         SRnd.SetSeed(islandSeed);
 
         DestroyPreviousIsland();
-        SetUpCenterVertex(generateAt); // Center of the island and pivot point
+
+        centerVertex = generateAt;
+
         SetUpFloors();
         SetUpTip();
-        CreateFloorsVertices();
-        SortAndIndexFloorVertices();
+        CreateVertices();
         if (generateMesh) GenerateIslandMesh();
     }
 
@@ -138,7 +139,7 @@ public class IslandMeshGenerator : MonoBehaviour
         {
             Floor floor = _floors[i];
 
-            float t = (float)i / _floors.Count;
+            float t = (float) i / _floors.Count;
 
             floor.index = i;
             floor.color = floorColorGradient.Evaluate(t);
@@ -153,7 +154,7 @@ public class IslandMeshGenerator : MonoBehaviour
     {
         if (IsFirstFloor(newFloor))
         {
-            newFloor.anchorPos = centerVertex.position;
+            newFloor.anchorPos = centerVertex;
         }
         else
         {
@@ -172,23 +173,12 @@ public class IslandMeshGenerator : MonoBehaviour
         newFloor.radius = radius;
     }
 
-    private void SetUpCenterVertex(Vector3 islandPos)
-    {
-        centerVertex = new Vertex
-        {
-            position = islandPos
-        };
-    }
-
     private void SetUpTip()
     {
         Vector3 randomPos = GetFloorPos(_floors[^1]);
         Vector3 lastAnchorPos = _floors[^1].anchorPos;
         float y = lastAnchorPos.y - randomPos.y;
-        tipVertex = new Vertex
-        {
-            position = new Vector3(randomPos.x, y, randomPos.z)
-        };
+        tipVertex = new Vector3(randomPos.x, y, randomPos.z);
     }
 
     private Vector3 GetFloorPos(Floor previousFloor)
@@ -200,7 +190,7 @@ public class IslandMeshGenerator : MonoBehaviour
         return new Vector3(xOffset, height, zOffset);
     }
 
-    private void CreateFloorsVertices()
+    private void CreateVertices()
     {
         foreach (var floor in _floors)
         {
@@ -217,31 +207,8 @@ public class IslandMeshGenerator : MonoBehaviour
                 float z = floor.anchorPos.z + floorRadius * Mathf.Sin(angle) + SRnd.RangeFloat(0, verticesMaxOffset);
 
                 Vector3 vertexPos = new Vector3(x, y, z);
-
-                Vertex newVertex = new Vertex
-                {
-                    position = vertexPos
-                };
-
-                floor.vertices.Add(newVertex);
+                islandVertices.Add(vertexPos);
             }
-        }
-    }
-
-    private void SortAndIndexFloorVertices()
-    {
-        foreach (var floor in _floors)
-        {
-            List<Vertex> sortedVertices = SortVerticesClockwise(floor.vertices, floor.anchorPos);
-
-            for (var i = 0; i < sortedVertices.Count; i++)
-            {
-                var vertex = sortedVertices[i];
-                vertex.index = (sortedVertices.Count - i) - 1; // -1 to start at 0
-            }
-
-            sortedVertices.Reverse();
-            floor.vertices = sortedVertices;
         }
     }
 
@@ -249,17 +216,8 @@ public class IslandMeshGenerator : MonoBehaviour
     {
         islandMesh = new Mesh();
 
-        foreach (var floor in _floors)
-        {
-            // Index all floors vertices to global list of vertices
-            foreach (var t in floor.vertices)
-            {
-                islandVertices.Add(t.position);
-            }
-        }
-
-        islandVertices.Add(centerVertex.position);
-        islandVertices.Add(tipVertex.position);
+        islandVertices.Add(centerVertex);
+        islandVertices.Add(tipVertex);
 
         foreach (var floor in _floors)
         {
@@ -343,38 +301,6 @@ public class IslandMeshGenerator : MonoBehaviour
         islandMeshFilter.mesh = islandMesh;
     }
 
-    private List<Vertex> SortVerticesClockwise(List<Vertex> vertices, Vector3 referencePoint)
-    {
-        vertices.Sort((p1, p2) => ClockwiseCompare(p1.position, p2.position, referencePoint));
-        return vertices;
-    }
-
-    private int ClockwiseCompare(Vector3 p1, Vector3 p2, Vector3 referencePoint)
-    {
-        // Convert to 2d
-        p1 = new Vector3(p1.x, 0, p1.z);
-        p2 = new Vector3(p2.x, 0, p2.z);
-        referencePoint = new Vector3(referencePoint.x, 0, referencePoint.z);
-
-        float angle1 = Mathf.Atan2(p1.z - referencePoint.z, p1.x - referencePoint.x);
-        float angle2 = Mathf.Atan2(p2.z - referencePoint.z, p2.x - referencePoint.x);
-
-        if (angle1 < angle2)
-        {
-            return -1;
-        }
-        else if (angle1 > angle2)
-        {
-            return 1;
-        }
-        else
-        {
-            float distance1 = Vector3.Distance(p1, referencePoint);
-            float distance2 = Vector3.Distance(p2, referencePoint);
-            return distance1.CompareTo(distance2);
-        }
-    }
-
     private Floor GetNextFloor(Floor currentFloor)
     {
         if (currentFloor.index == _floors.Count - 1) // last Floor
@@ -403,10 +329,10 @@ public class IslandMeshGenerator : MonoBehaviour
 
     private Vector3 GetNextFloorAnchor(Floor currentFloor)
     {
-        return currentFloor.index == _floors.Count - 1 ? tipVertex.position : _floors[currentFloor.index + 1].anchorPos;
+        return currentFloor.index == _floors.Count - 1 ? tipVertex : _floors[currentFloor.index + 1].anchorPos;
     }
 
-    private bool IsFirstFloor(Floor floor)
+    private static bool IsFirstFloor(Floor floor)
     {
         return floor.index == 0;
     }
@@ -426,16 +352,16 @@ public class IslandMeshGenerator : MonoBehaviour
         {
             if (showIslandSpine) DrawSpine(floor, GetNextFloorAnchor(floor));
             if (showFloorsRadius) DrawFloorRadius(floor);
-            if (showVertices) DrawFloorVertices(floor);
-            if (showVerticesLinks) DrawVerticesLinksInFloor(floor);
-            if (showVerticesLinks) DrawVerticesLinksBetweenFloor(floor);
-
+            
             if (showFloorLabels)
             {
                 string floorTextLabel = "Floor " + floor.index + "\nVertices Count : " + floor.verticesCount;
                 Handles.Label(floor.anchorPos, floorTextLabel);
             }
         }
+
+        if (showVertices) DrawVertices();
+        if (showVerticesLinks) DrawVerticesLinks();
 
         if (showVertices)
         {
@@ -445,8 +371,8 @@ public class IslandMeshGenerator : MonoBehaviour
 
         if (showVerticesLabels)
         {
-            Handles.Label(centerVertex.position, "Center \nPos : " + centerVertex.position);
-            Handles.Label(tipVertex.position, "Tip \nPos : " + tipVertex.position);
+            Handles.Label(centerVertex, "Center \nPos : " + centerVertex);
+            Handles.Label(tipVertex, "Tip \nPos : " + tipVertex);
         }
     }
 
@@ -456,15 +382,14 @@ public class IslandMeshGenerator : MonoBehaviour
         Handles.DrawWireDisc(floor.anchorPos, Vector3.up, floor.radius, 3);
     }
 
-    private void DrawFloorVertices(Floor floor)
+    private void DrawVertices()
     {
-        Gizmos.color = floor.color;
-
-        foreach (var vertex in floor.vertices)
+        for (var i = 0; i < islandVertices.Count; i++)
         {
-            Gizmos.DrawSphere(vertex.position, verticesGizmosSize);
-            if (showVerticesLabels)
-                Handles.Label(vertex.position, "Vextex " + vertex.index + " \nPos : " + vertex.position);
+            Vector3 vertex = islandVertices[i];
+            Gizmos.color= floorColorGradient.Evaluate((float) i / islandVertices.Count);
+            Gizmos.DrawSphere(vertex, verticesGizmosSize);
+            if (showVerticesLabels) Handles.Label(vertex, "Vextex " + i + " \nPos : " + vertex);
         }
     }
 
@@ -477,57 +402,51 @@ public class IslandMeshGenerator : MonoBehaviour
     private void DrawCenterVertex()
     {
         Gizmos.color = centerGizmosColor;
-        Gizmos.DrawSphere(centerVertex.position, verticesGizmosSize);
+        Gizmos.DrawSphere(centerVertex, verticesGizmosSize);
     }
 
     private void DrawTipVertex()
     {
         Gizmos.color = tipGizmosColor;
-        Gizmos.DrawSphere(tipVertex.position, verticesGizmosSize);
+        Gizmos.DrawSphere(tipVertex, verticesGizmosSize);
     }
 
-    private void DrawVerticesLinksInFloor(Floor floor)
+    private void DrawVerticesLinks()
     {
-        for (var index = 0; index < floor.vertices.Count; index++)
+        for (int i = 0; i < islandVertices.Count; i++)
         {
-            var vertex = floor.vertices[index];
+            Vector3 vertex = islandVertices[i];
 
-            Handles.color = floor.color;
-
-            if (index == floor.vertices.Count - 1)
+            Handles.color = floorColorGradient.Evaluate((float) i / islandVertices.Count);
+            
+            // If first floor, draw to island center
+            if (i < meshComplexity)
             {
-                Handles.DrawLine(vertex.position, floor.vertices[0].position, verticesLinksThickness);
+                Handles.DrawLine(vertex, centerVertex, verticesLinksThickness);
             }
-            else Handles.DrawLine(vertex.position, floor.vertices[index + 1].position, verticesLinksThickness);
-        }
-    }
-
-    private void DrawVerticesLinksBetweenFloor(Floor floor)
-    {
-        if (IsLastFloor(floor))
-        {
-            foreach (var vertex in floor.vertices)
+            
+            
+            // Draw to next vertex in floor
+            if ((i + 1) % meshComplexity == 0)
             {
-                Handles.color = floor.color;
-                Handles.DrawLine(vertex.position, tipVertex.position, verticesLinksThickness);
+                Handles.DrawLine(vertex,  islandVertices[i - (meshComplexity -1)], verticesLinksThickness);
             }
-        }
-        else
-        {
-            Floor nextFloor = GetNextFloor(floor);
-
-            for (var index = 0; index < floor.vertices.Count; index++)
+            else
             {
-                Handles.color = floor.color;
-
-                Handles.DrawLine(
-                    floor.vertices[index].position, nextFloor.vertices[index].position, verticesLinksThickness);
-
-                if (IsFirstFloor(floor))
-                {
-                    Handles.DrawLine(floor.vertices[index].position, centerVertex.position, verticesLinksThickness);
-                }
+                Handles.DrawLine(vertex,  islandVertices[i + 1], verticesLinksThickness);
             }
+            
+            
+            // Draw to same vertex in next floor, or if last floor to tip vertex
+            if (i < meshComplexity  * (_floors.Count - 1))
+            {
+                Handles.DrawLine(vertex,  islandVertices[i + meshComplexity], verticesLinksThickness);
+            }
+            else
+            {
+                Handles.DrawLine(vertex,  tipVertex, verticesLinksThickness);
+            }
+            
         }
     }
 #endif

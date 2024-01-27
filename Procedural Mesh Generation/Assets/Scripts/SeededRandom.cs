@@ -90,19 +90,6 @@ public static class SRnd
         return NextFloat() * (max - min) + min;
     }
 
-    public static Vector2 GenerateRandomPointInsideUnitCircle()
-    {
-        // Step 1: Generate a random angle in radians
-        float theta = NextFloat() * 2 * Mathf.PI;
-
-        // Step 2: Convert polar coordinates to Cartesian coordinates
-        float x = Mathf.Cos(theta);
-        float y = Mathf.Sin(theta);
-
-        return new Vector2(x, y);
-    }
-    
-    
     /// <summary>
     /// Returns a random bool value
     /// </summary>
