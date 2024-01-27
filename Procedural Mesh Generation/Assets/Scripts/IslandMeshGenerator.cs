@@ -143,7 +143,6 @@ public class IslandMeshGenerator : MonoBehaviour
 
             floor.index = i;
             floor.color = floorColorGradient.Evaluate(t);
-            floor.verticesCount = meshComplexity;
 
             SetUpFloorAnchor(floor);
             SetUpFloorRadius(floor, upwardSwelling, tempRadius);
@@ -196,9 +195,9 @@ public class IslandMeshGenerator : MonoBehaviour
         {
             var floorRadius = floor.radius;
 
-            for (int i = 0; i < floor.verticesCount; i++)
+            for (int i = 0; i < meshComplexity; i++)
             {
-                float angle = i * 2 * Mathf.PI / floor.verticesCount;
+                float angle = i * 2 * Mathf.PI / meshComplexity;
 
                 float x = floor.anchorPos.x + floorRadius * Mathf.Cos(angle) + SRnd.RangeFloat(0, verticesMaxOffset);
                 float y = IsFirstFloor(floor)
@@ -221,39 +220,30 @@ public class IslandMeshGenerator : MonoBehaviour
 
         foreach (var floor in _floors)
         {
-            if (IsLastFloor(floor))
+            for (int i = 0; i < meshComplexity; i++)
             {
-                for (int i = 0; i < meshComplexity; i++)
+                int currentVertex = i + floor.index * meshComplexity;
+
+                if (i == meshComplexity - 1)
                 {
-                    if (i == meshComplexity - 1)
+                    // Ground on island
+                    islandTriangles.Add(i);
+                    islandTriangles.Add(0);
+                    islandTriangles.Add(islandVertices.Count - 2); // Center vertex
+
+                    int firstVertexInFloor = floor.index * meshComplexity;
+
+                    if (IsLastFloor(floor))
                     {
-                        islandTriangles.Add(floor.index * meshComplexity);
-                        islandTriangles.Add(i + floor.index * meshComplexity);
+                        islandTriangles.Add(firstVertexInFloor);
+                        islandTriangles.Add(currentVertex);
                         islandTriangles.Add(i + floor.index * meshComplexity + 2);
                     }
                     else
                     {
-                        islandTriangles.Add(i + floor.index * meshComplexity + 1);
-                        islandTriangles.Add(i + floor.index * meshComplexity);
-                        islandTriangles.Add(islandVertices.Count - 1);
-                    }
-                }
-            }
-            else
-            {
-                Floor nextFloor = GetNextFloor(floor);
+                        int firstVertexInNextFloor = _floors[floor.index + 1].index * meshComplexity;
+                        int currentVertexInNextFloor = i + _floors[floor.index + 1].index * meshComplexity;
 
-                for (int i = 0; i < meshComplexity; i++)
-                {
-                    int firstVertexInFloor = floor.index * meshComplexity;
-                    int firstVertexInNextFloor = nextFloor.index * meshComplexity;
-                    int currentVertex = i + floor.index * meshComplexity;
-                    int nextVertexInFloor = i + floor.index * meshComplexity + 1;
-                    int currentVertexInNextFloor = i + nextFloor.index * meshComplexity;
-                    int nextVertexInNextFloor = i + nextFloor.index * meshComplexity + 1;
-
-                    if (i == meshComplexity - 1)
-                    {
                         islandTriangles.Add(firstVertexInFloor);
                         islandTriangles.Add(currentVertex);
                         islandTriangles.Add(currentVertexInNextFloor);
@@ -262,8 +252,27 @@ public class IslandMeshGenerator : MonoBehaviour
                         islandTriangles.Add(firstVertexInFloor);
                         islandTriangles.Add(currentVertexInNextFloor);
                     }
+                }
+                else
+                {
+                    // Ground on island
+                    islandTriangles.Add(i);
+                    islandTriangles.Add(i + 1);
+                    islandTriangles.Add(islandVertices.Count - 2); // Center vertex
+
+                    int nextVertexInFloor = i + floor.index * meshComplexity + 1;
+
+                    if (IsLastFloor(floor))
+                    {
+                        islandTriangles.Add(nextVertexInFloor);
+                        islandTriangles.Add(currentVertex);
+                        islandTriangles.Add(islandVertices.Count - 1);
+                    }
                     else
                     {
+                        int currentVertexInNextFloor = i + _floors[floor.index + 1].index * meshComplexity;
+                        int nextVertexInNextFloor = i + _floors[floor.index + 1].index * meshComplexity + 1;
+
                         islandTriangles.Add(nextVertexInFloor);
                         islandTriangles.Add(currentVertex);
                         islandTriangles.Add(currentVertexInNextFloor);
@@ -273,23 +282,6 @@ public class IslandMeshGenerator : MonoBehaviour
                         islandTriangles.Add(currentVertexInNextFloor);
                     }
                 }
-            }
-        }
-
-        // generate ground on island
-        for (int i = 0; i < meshComplexity; i++)
-        {
-            if (i == meshComplexity - 1)
-            {
-                islandTriangles.Add(i);
-                islandTriangles.Add(0);
-                islandTriangles.Add(islandVertices.Count - 2); // Center vertex
-            }
-            else
-            {
-                islandTriangles.Add(i);
-                islandTriangles.Add(i + 1);
-                islandTriangles.Add(islandVertices.Count - 2); // Center vertex
             }
         }
 
@@ -352,10 +344,10 @@ public class IslandMeshGenerator : MonoBehaviour
         {
             if (showIslandSpine) DrawSpine(floor, GetNextFloorAnchor(floor));
             if (showFloorsRadius) DrawFloorRadius(floor);
-            
+
             if (showFloorLabels)
             {
-                string floorTextLabel = "Floor " + floor.index + "\nVertices Count : " + floor.verticesCount;
+                string floorTextLabel = "Floor " + floor.index + "\nPOS : " + floor.anchorPos;
                 Handles.Label(floor.anchorPos, floorTextLabel);
             }
         }
@@ -387,7 +379,7 @@ public class IslandMeshGenerator : MonoBehaviour
         for (var i = 0; i < islandVertices.Count; i++)
         {
             Vector3 vertex = islandVertices[i];
-            Gizmos.color= floorColorGradient.Evaluate((float) i / islandVertices.Count);
+            Gizmos.color = floorColorGradient.Evaluate((float) i / islandVertices.Count);
             Gizmos.DrawSphere(vertex, verticesGizmosSize);
             if (showVerticesLabels) Handles.Label(vertex, "Vextex " + i + " \nPos : " + vertex);
         }
@@ -418,35 +410,36 @@ public class IslandMeshGenerator : MonoBehaviour
             Vector3 vertex = islandVertices[i];
 
             Handles.color = floorColorGradient.Evaluate((float) i / islandVertices.Count);
-            
+
             // If first floor, draw to island center
             if (i < meshComplexity)
             {
                 Handles.DrawLine(vertex, centerVertex, verticesLinksThickness);
             }
-            
-            
+
+
             // Draw to next vertex in floor
             if ((i + 1) % meshComplexity == 0)
             {
-                Handles.DrawLine(vertex,  islandVertices[i - (meshComplexity -1)], verticesLinksThickness);
+                Handles.DrawLine(vertex, islandVertices[i - (meshComplexity - 1)], verticesLinksThickness);
             }
             else
             {
-                Handles.DrawLine(vertex,  islandVertices[i + 1], verticesLinksThickness);
+                if (i < islandVertices.Count - 2)
+                {
+                    Handles.DrawLine(vertex, islandVertices[i + 1], verticesLinksThickness);
+                }
             }
-            
-            
+
             // Draw to same vertex in next floor, or if last floor to tip vertex
-            if (i < meshComplexity  * (_floors.Count - 1))
+            if (i < meshComplexity * (_floors.Count - 1))
             {
-                Handles.DrawLine(vertex,  islandVertices[i + meshComplexity], verticesLinksThickness);
+                Handles.DrawLine(vertex, islandVertices[i + meshComplexity], verticesLinksThickness);
             }
             else
             {
-                Handles.DrawLine(vertex,  tipVertex, verticesLinksThickness);
+                if (vertex != centerVertex) Handles.DrawLine(vertex, tipVertex, verticesLinksThickness);
             }
-            
         }
     }
 #endif

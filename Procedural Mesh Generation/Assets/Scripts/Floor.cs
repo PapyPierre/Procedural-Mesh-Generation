@@ -9,6 +9,4 @@ public class Floor
     public Vector3 anchorPos;
     public float radius;
     public Color color;
-    public int verticesCount;
-    public List<Vertex> vertices = new List<Vertex>();
 }
