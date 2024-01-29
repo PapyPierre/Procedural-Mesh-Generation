@@ -8,5 +8,4 @@ public class Floor
     public int index;
     public Vector3 anchorPos;
     public float radius;
-    public Color color;
 }
