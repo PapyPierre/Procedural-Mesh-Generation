@@ -1,13 +1,20 @@
-﻿using Island_Generation;
+﻿using System.Collections;
+using Island_Generation;
 using UnityEngine;
 
 // Example Class
 public class IslandGeneratorCaller : MonoBehaviour
 {
     [SerializeField] private IslandGenerationData generationData;
-
-    private void Start()
+    [SerializeField] private Vector3 generateAt;
+    
+    private IEnumerator Start()
     {
-       IslandMeshGenerator.GenerateIsland(Vector3.zero, generationData);
+        for (int i = 0; i < 100; i++)
+        {
+          GameObject lastIsland = IslandMeshGenerator.GenerateIsland(generateAt, generationData);
+          yield return new WaitForSeconds(2);
+          Destroy(lastIsland);
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace Island_Generation
 {
     public static class IslandMeshGenerator
     {
-        public static uint GenerateIsland(Vector3 position, IslandGenerationData data, uint seed = 0)
+        public static GameObject GenerateIsland(Vector3 position, IslandGenerationData data, uint seed = 0)
         {
             Island generatedIsland = new Island();
 
@@ -22,9 +22,8 @@ namespace Island_Generation
             SetUpFloors(generatedIsland);
             SetUpTip(generatedIsland);
             CreateVertices(generatedIsland);
-            GenerateIslandMesh(generatedIsland);
         
-            return finalSeed;
+            return GenerateIslandMesh(generatedIsland);
         }
 
         private static void SetUpFloors(Island island)
@@ -120,7 +119,7 @@ namespace Island_Generation
             return new Vector3(x, y, z);
         }
 
-        private static void GenerateIslandMesh(Island island)
+        private static GameObject GenerateIslandMesh(Island island)
         {
             Mesh mesh = new Mesh();
 
@@ -147,6 +146,8 @@ namespace Island_Generation
             MeshFilter islandMeshFilter = islandObj.AddComponent<MeshFilter>();
             islandMeshFilter.mesh = mesh;
             islandMeshFilter.mesh.name = "Generated Island Mesh";
+            
+            return islandObj;
         }
 
         private static void GenerateFloorTriangles(Island island, Floor floor)
