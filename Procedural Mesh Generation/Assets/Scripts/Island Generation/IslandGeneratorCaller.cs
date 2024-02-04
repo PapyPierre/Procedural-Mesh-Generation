@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Island_Generation;
+using UnityEngine;
 
 // Example Class
 public class IslandGeneratorCaller : MonoBehaviour

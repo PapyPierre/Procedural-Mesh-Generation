@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 311a35e9fd964b98a79de9bd66627a19, type: 3}
-  m_Name: IslandGenerationPreset
+  m_Name: IslandGenerationData
   m_EditorClassIdentifier: 
   material: {fileID: 2100000, guid: 15aa3b87461aea14a98a0441d1a7957e, type: 2}
   minFloorCount: 6
