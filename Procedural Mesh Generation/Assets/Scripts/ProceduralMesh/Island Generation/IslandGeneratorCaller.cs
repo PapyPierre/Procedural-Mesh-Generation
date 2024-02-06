@@ -13,7 +13,7 @@ public class IslandGeneratorCaller : MonoBehaviour
         for (int i = 0; i < 100; i++)
         {
           GameObject lastIsland = IslandMeshGenerator.GenerateIsland(generateAt, generationData);
-          yield return new WaitForSeconds(2);
+          yield return new WaitForSeconds(5);
           Destroy(lastIsland);
         }
     }
