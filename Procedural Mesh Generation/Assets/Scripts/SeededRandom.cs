@@ -12,7 +12,6 @@ public static class SRnd
 
     public static void SetSeed(uint newSeed)
     {
-        //sets new seed, resets position (cursor-like indicator to know which number we are considering)
         position = 0;
         seed = newSeed;
     }
@@ -48,13 +47,6 @@ public static class SRnd
 
         return _mangled;
     }
-
-    // public static uint GetLastUint()
-    // {
-    //     //gets last generated number
-    //     _result = Squirrel3(position - 1, seed);
-    //     return _result;
-    // }
 
     /// <summary>
     /// Returns a random int value between the two values specified

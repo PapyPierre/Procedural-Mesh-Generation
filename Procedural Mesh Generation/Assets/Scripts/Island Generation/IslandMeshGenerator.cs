@@ -13,7 +13,7 @@ namespace Island_Generation
 
             if (seed == 0) finalSeed = (uint) Random.Range(0, 9999999);
             else finalSeed = seed;
-        
+
             generatedIsland.Data = data;
             SRnd.SetSeed(finalSeed);
 
@@ -22,7 +22,7 @@ namespace Island_Generation
             SetUpFloors(generatedIsland);
             SetUpTip(generatedIsland);
             CreateVertices(generatedIsland);
-        
+
             return GenerateIslandMesh(generatedIsland);
         }
 
@@ -105,17 +105,17 @@ namespace Island_Generation
         private static Vector3 GetVertexPos(Island island, Floor floor, float floorRadius, int index)
         {
             float angle = index * 2 * Mathf.PI / island.Data.MeshComplexity;
-            
+
             float x = floor.anchorPos.x + floorRadius * Mathf.Cos(angle) +
                       SRnd.RangeFloat(0, island.Data.VerticesMaxOffset);
-                    
+
             float y = IsFirstFloor(floor)
                 ? island.Floors[0].anchorPos.y
                 : floor.anchorPos.y + SRnd.RangeFloat(0, island.Data.VerticesMaxOffset / floor.index);
-                    
+
             float z = floor.anchorPos.z + floorRadius * Mathf.Sin(angle) +
                       SRnd.RangeFloat(0, island.Data.VerticesMaxOffset);
-            
+
             return new Vector3(x, y, z);
         }
 
@@ -140,13 +140,13 @@ namespace Island_Generation
             {
                 name = "Generated Island"
             };
-        
+
             MeshRenderer renderer = islandObj.AddComponent<MeshRenderer>();
             renderer.material = island.Data.Material;
             MeshFilter islandMeshFilter = islandObj.AddComponent<MeshFilter>();
             islandMeshFilter.mesh = mesh;
             islandMeshFilter.mesh.name = "Generated Island Mesh";
-            
+
             return islandObj;
         }
 
