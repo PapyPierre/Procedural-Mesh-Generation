@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 311a35e9fd964b98a79de9bd66627a19, type: 3}
   m_Name: IslandGenerationData
   m_EditorClassIdentifier: 
-  <Material>k__BackingField: {fileID: 2100000, guid: 15aa3b87461aea14a98a0441d1a7957e,
+  <ObjName>k__BackingField: Generated Island Obj
+  <MeshName>k__BackingField: Generated Island Mesh
+  <Material>k__BackingField: {fileID: 2100000, guid: e9a4632b634e9f44a8b8798eee2be6b0,
     type: 2}
   <MinFloorCount>k__BackingField: 6
   <MaxFloorCount>k__BackingField: 15
@@ -22,6 +24,10 @@ MonoBehaviour:
   <MaxFloorsRadius>k__BackingField: 8
   <FloorsMaxOffset>k__BackingField: 8
   <VerticesMaxOffset>k__BackingField: 1
-  <MinUpwardSwelling>k__BackingField: 0.8
-  <MaxUpwardSwelling>k__BackingField: 1.3
-  <MeshComplexity>k__BackingField: 10
+  <MinDirectionSwelling>k__BackingField: 1
+  <MaxDirectionSwelling>k__BackingField: 2
+  <SwellingDirection>k__BackingField: 1
+  <RandomSwellingChance>k__BackingField: 0
+  <MinRandomSwelling>k__BackingField: 0
+  <MaxRandomSwelling>k__BackingField: 2
+  <MeshComplexity>k__BackingField: 15
