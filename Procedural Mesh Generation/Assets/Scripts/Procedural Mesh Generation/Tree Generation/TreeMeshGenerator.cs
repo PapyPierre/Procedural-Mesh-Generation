@@ -16,12 +16,18 @@ namespace Procedural_Mesh_Generation.Tree_Generation
             generatedTreeMeshData.CenterVertex = position;
 
             SetUpFloors(generatedTreeMeshData);
+            CreateVertices(generatedTreeMeshData);
 
             return GenerateTreeMesh(generatedTreeMeshData);
         }
 
         private static GeneratedTree GenerateTreeMesh(TreeMeshData treeMeshData)
         {
+            foreach (var floor in treeMeshData.Floors)
+            {
+                AddTrianglesToMeshData(treeMeshData, floor);
+            }
+            
             return GenerateObj<GeneratedTree>(CreateMesh(treeMeshData), treeMeshData);
         }
     }

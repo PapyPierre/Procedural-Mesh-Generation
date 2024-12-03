@@ -1,5 +1,7 @@
 ﻿using System;
-using Procedural_Mesh_Generation.Tree_Generation;
+using System.Collections.Generic;
+using Procedural_Mesh_Generation.Island_Generation;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -19,8 +21,9 @@ namespace Procedural_Mesh_Generation
         {
             int floorCount = SRnd.RangeInt(meshData.GenerationData.MinFloorCount,
                 meshData.GenerationData.MaxFloorCount + 1);
-            
-            int necessaryBranching = SRnd.RangeInt(2, meshData.GenerationData.MaxNumberOfBranches) - 1;
+
+            int necessaryBranching = SRnd.RangeInt(meshData.GenerationData.MinNumberOfBranches,
+                meshData.GenerationData.MaxNumberOfBranches) - 1;
 
             GenerateFloors(meshData, floorCount, ref necessaryBranching);
 
@@ -36,11 +39,9 @@ namespace Procedural_Mesh_Generation
             }
         }
 
-        private static void GenerateFloors(MeshData meshData, int floorCountToGenerate,ref int necessaryBranching,
+        private static void GenerateFloors(MeshData meshData, int floorCountToGenerate, ref int necessaryBranching,
             int baseIndexOfNewBranch = 0)
         {
-            float branchingProba = 100f / floorCountToGenerate;
-
             for (int i = 0; i < floorCountToGenerate; i++)
             {
                 Floor floor = new Floor
@@ -48,34 +49,41 @@ namespace Procedural_Mesh_Generation
                     Index = baseIndexOfNewBranch + i
                 };
 
-                if (necessaryBranching > 0 && !IsFirstFloor(floor))
+                float branchingProba =
+                    meshData.GenerationData.BranchingProba.Evaluate((float)floor.Index / floorCountToGenerate);
+
+                if (necessaryBranching > 0 && !meshData.IsFirstFloor(floor))
                 {
-                    if (SRnd.RangeFloat(0, 100) <= branchingProba)
+                    if (SRnd.RangeFloat(0, 1) <= branchingProba)
                     {
                         floor.IsBranching = true;
                         necessaryBranching--;
                         meshData.Floors.Add(floor);
                         GenerateFloors(meshData, floorCountToGenerate - i, ref necessaryBranching, i++);
-                        GenerateFloors(meshData, (floorCountToGenerate - i) /2, ref necessaryBranching, i++);
+                        GenerateFloors(meshData, (floorCountToGenerate - i) / 2, ref necessaryBranching, i++);
                         return;
                     }
                 }
 
-                branchingProba += 100f / floorCountToGenerate;
                 meshData.Floors.Add(floor);
             }
         }
 
         private static void SetFloorAnchor(MeshData meshData, Floor floor)
         {
-            if (IsFirstFloor(floor))
+            if (meshData.IsFirstFloor(floor))
             {
                 floor.AnchorPos = meshData.CenterVertex;
             }
             else
             {
-                Floor previousFloor = GetPreviousFloor(meshData, floor);
-                Vector3 randomPos = GetFloorPos(meshData.GenerationData, previousFloor);
+                Floor previousFloor;
+
+
+                previousFloor = meshData.GetPreviousFloor(floor);
+
+
+                Vector3 randomPos = GetFloorPos(meshData, floor);
 
                 Vector3 previousFloorAnchorPos = previousFloor.AnchorPos;
 
@@ -93,7 +101,7 @@ namespace Procedural_Mesh_Generation
         private static void SetFloorRadius(MeshData meshData, Floor newFloor, float directionnalSwelling,
             float tempRadius)
         {
-            float directionalSwellingValue = Mathf.Pow(meshData.Floors.Count - newFloor.Index, directionnalSwelling);
+            float directionalSwellingValue = (meshData.Floors.Count - newFloor.Index) * directionnalSwelling;
 
             float randomSwelling = 0;
 
@@ -107,39 +115,121 @@ namespace Procedural_Mesh_Generation
             newFloor.Radius = radius;
         }
 
-        private static Floor GetPreviousFloor(MeshData meshData, Floor currentFloor)
+        protected static Vector3 GetFloorPos(MeshData data, Floor currentFloor)
         {
-            if (currentFloor.Index == 0)
-            {
-                Debug.LogError("Is first floor");
-                return null;
-            }
+            float height = SRnd.RangeFloat(data.GenerationData.MinFloorsHeight, data.GenerationData.MaxFloorsHeight);
 
-            return meshData.Floors[currentFloor.Index - 1];
-        }
+            float offsetValue =
+                data.GenerationData.FloorsMaxOffsetAlongObj.Evaluate((float)currentFloor.Index / data.Floors.Count);
 
-        protected static Vector3 GetFloorPos(MeshGenerationData data, Floor previousFloor)
-        {
-            float height = SRnd.RangeFloat(data.MinFloorsHeight, data.MaxFloorsHeight);
-            float xOffset = SRnd.RangeFloat(-data.FloorsMaxOffset, data.FloorsMaxOffset) + previousFloor.AnchorPos.x;
-            float zOffset = SRnd.RangeFloat(-data.FloorsMaxOffset, data.FloorsMaxOffset) + previousFloor.AnchorPos.z;
+            float xOffset = SRnd.RangeFloat(-offsetValue, offsetValue) +
+                            data.GetPreviousFloor(currentFloor).AnchorPos.x;
+            float zOffset = SRnd.RangeFloat(-offsetValue, offsetValue) +
+                            data.GetPreviousFloor(currentFloor).AnchorPos.z;
 
             return new Vector3(xOffset, height, zOffset);
         }
 
-        protected static bool IsFirstFloor(Floor floor) => floor.Index == 0;
-        protected static bool IsLastFloor(MeshData meshData, Floor floor) => floor.Index == meshData.Floors.Count - 1;
+        #endregion
+
+        #region Verticies
+
+        protected static void CreateVertices(MeshData meshData)
+        {
+            foreach (var floor in meshData.Floors)
+            {
+                for (int i = 0; i < meshData.GenerationData.MeshComplexity; i++)
+                {
+                    floor.Vertices.Add(GetVertexPos(meshData, floor, i));
+                }
+            }
+        }
+
+        private static Vector3 GetVertexPos(MeshData meshData, Floor floor, int index)
+        {
+            float angle = index * 2 * Mathf.PI / meshData.GenerationData.MeshComplexity;
+
+            float x = floor.AnchorPos.x + floor.Radius * Mathf.Cos(angle) +
+                      SRnd.RangeFloat(0, meshData.GenerationData.VerticesMaxOffset);
+
+            float y = meshData.IsFirstFloor(floor)
+                ? meshData.Floors[0].AnchorPos.y
+                : floor.AnchorPos.y + SRnd.RangeFloat(0, meshData.GenerationData.VerticesMaxOffset / floor.Index);
+
+            float z = floor.AnchorPos.z + floor.Radius * Mathf.Sin(angle) +
+                      SRnd.RangeFloat(0, meshData.GenerationData.VerticesMaxOffset);
+
+            return new Vector3(x, y, z);
+        }
 
         #endregion
 
+        protected static void AddTrianglesToMeshData(MeshData meshData, Floor floor)
+        {
+            int meshComplexity = meshData.GenerationData.MeshComplexity;
+
+            for (int i = 0; i < meshComplexity; i++)
+            {
+                int currentVertex = i + floor.Index * meshComplexity;
+
+                // If last vertex in floor (need to apply changes for it to loop)
+                if (i == meshComplexity - 1)
+                {
+                    int firstVertexInFloor = floor.Index * meshComplexity;
+                    
+                    if (meshData.IsLastFloor(floor)) continue;
+
+                    int firstVertexInNextFloor = meshData.Floors[floor.Index + 1].Index * meshComplexity;
+                    int currentVertexInNextFloor = i + meshData.Floors[floor.Index + 1].Index * meshComplexity;
+
+                    meshData.Triangles.Add(currentVertex);
+                    meshData.Triangles.Add(firstVertexInFloor);
+                    meshData.Triangles.Add(currentVertexInNextFloor);
+
+                    meshData.Triangles.Add(firstVertexInFloor);
+                    meshData.Triangles.Add(firstVertexInNextFloor);
+                    meshData.Triangles.Add(currentVertexInNextFloor);
+                }
+                else
+                {
+                    int nextVertexInFloor = i + floor.Index * meshComplexity + 1;
+
+                    if (meshData.IsLastFloor(floor)) continue;
+                    
+                    int currentVertexInNextFloor = i + meshData.Floors[floor.Index + 1].Index * meshComplexity;
+                    int nextVertexInNextFloor = i + meshData.Floors[floor.Index + 1].Index * meshComplexity + 1;
+
+                    meshData.Triangles.Add(currentVertex);
+                    meshData.Triangles.Add(nextVertexInFloor);
+                    meshData.Triangles.Add(currentVertexInNextFloor);
+
+                    meshData.Triangles.Add(nextVertexInFloor);
+                    meshData.Triangles.Add(nextVertexInNextFloor);
+                    meshData.Triangles.Add(currentVertexInNextFloor);
+                }
+            }
+        }
+
+
         protected static Mesh CreateMesh(MeshData data)
         {
-            Mesh mesh = new Mesh
-            {
-                vertices = data.Vertices.ToArray(),
-                triangles = data.Triangles.ToArray()
-            };
+            Mesh mesh = new Mesh();
 
+            List<Vector3> allVertices = new List<Vector3>();
+
+            foreach (var floor in data.Floors)
+            {
+                foreach (var vertex in floor.Vertices)
+                {
+                    allVertices.Add(vertex);
+                }
+            }
+
+            allVertices.Add(data.CenterVertex);
+            if (data is IslandMeshData islandMeshData) allVertices.Add(islandMeshData.TipVertex);
+
+            mesh.vertices = allVertices.ToArray();
+            mesh.triangles = data.Triangles.ToArray();
             mesh.RecalculateNormals();
             mesh.name = data.GenerationData.MeshName;
 

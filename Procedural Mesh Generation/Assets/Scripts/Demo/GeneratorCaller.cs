@@ -11,14 +11,23 @@ namespace Demo
         [SerializeField] private TreeGenerationData m_treeGenerationData;
         [SerializeField] private Vector3 m_generateAt;
 
+        [SerializeField] private bool testIsland;
+        [SerializeField] private bool testTree;
+        
         private IEnumerator Start()
         {
-            //GeneratedIsland island = IslandMeshGenerator.GenerateIsland(m_generateAt, m_islandGenerationData);
-           GeneratedTree tree = TreeMeshGenerator.GenerateTree(m_generateAt, m_treeGenerationData);
-        
-            //Debuger.Instance.GeneratedObjToDebug.Add(island);
-            Debuger.Instance.GeneratedObjToDebug.Add(tree);
+            if (testIsland)
+            {
+                GeneratedIsland island = IslandMeshGenerator.GenerateIsland(m_generateAt, m_islandGenerationData);
+                Debuger.Instance.GeneratedObjToDebug.Add(island);
+            }
 
+            if (testTree)
+            {
+                GeneratedTree tree = TreeMeshGenerator.GenerateTree(m_generateAt, m_treeGenerationData);
+                Debuger.Instance.GeneratedObjToDebug.Add(tree);
+            }
+            
             yield return null;
             
             /*

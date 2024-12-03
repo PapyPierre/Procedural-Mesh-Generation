@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using NaughtyAttributes;
+using UnityEngine;
 
 namespace Procedural_Mesh_Generation
 {
@@ -29,7 +30,7 @@ namespace Procedural_Mesh_Generation
         [field: SerializeField] internal float MaxFloorsRadius { get; private set; }
 
         [field: SerializeField, Space, Tooltip("maximal floors offset on x and z axis")]
-        internal float FloorsMaxOffset { get; private set; }
+        internal AnimationCurve FloorsMaxOffsetAlongObj { get; private set; }
 
         [field: Header("Vertices"), SerializeField, Tooltip("maximal vertices offset on all axis")]
         internal float VerticesMaxOffset { get; private set; }
@@ -55,8 +56,14 @@ namespace Procedural_Mesh_Generation
         [field: SerializeField, Tooltip("Number of vertices per floor")]
         internal int MeshComplexity { get; private set; }
 
+        [field: SerializeField, Header("Branch")]
+        internal int MinNumberOfBranches { get; private set; }
+        
         [field: SerializeField]
         internal int MaxNumberOfBranches { get; private set; }
+        
+        [field: SerializeField]
+        internal AnimationCurve BranchingProba { get; private set; }
     }
 
     public enum GenerationDirection

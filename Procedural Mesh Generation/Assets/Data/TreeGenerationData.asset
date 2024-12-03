@@ -14,22 +14,78 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <ObjName>k__BackingField: Generated Tree Obj
   <MeshName>k__BackingField: Generated Tree Mesh
-  <Material>k__BackingField: {fileID: 10303, guid: 0000000000000000f000000000000000,
-    type: 0}
-  <MinFloorCount>k__BackingField: 5
-  <MaxFloorCount>k__BackingField: 9
+  <Material>k__BackingField: {fileID: 2100000, guid: 2da28f8a4b1047b40bd80612c7a9ed3a,
+    type: 2}
+  <MinFloorCount>k__BackingField: 4
+  <MaxFloorCount>k__BackingField: 8
   <MinFloorsHeight>k__BackingField: 2
   <MaxFloorsHeight>k__BackingField: 4
-  <MinFloorsRadius>k__BackingField: 0.1
-  <MaxFloorsRadius>k__BackingField: 0.7
-  <FloorsMaxOffset>k__BackingField: 1.5
-  <VerticesMaxOffset>k__BackingField: 1
-  <MinDirectionSwelling>k__BackingField: 0.6
-  <MaxDirectionSwelling>k__BackingField: 1
+  <MinFloorsRadius>k__BackingField: 0.002
+  <MaxFloorsRadius>k__BackingField: 0.005
+  <FloorsMaxOffsetAlongObj>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 3
+      outSlope: 3
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 4
+      inSlope: 3
+      outSlope: 3
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  <VerticesMaxOffset>k__BackingField: 0
+  <MinDirectionSwelling>k__BackingField: 5
+  <MaxDirectionSwelling>k__BackingField: 8
   <SwellingDirection>k__BackingField: 0
   <RandomSwellingChance>k__BackingField: 30
-  <MinRandomSwelling>k__BackingField: 0.2
-  <MaxRandomSwelling>k__BackingField: 0.5
-  <MeshComplexity>k__BackingField: 8
-  <MinNumberOfBranches>k__BackingField: 1
-  <MaxNumberOfBranches>k__BackingField: 3
+  <MinRandomSwelling>k__BackingField: 0.01
+  <MaxRandomSwelling>k__BackingField: 0.07
+  <MeshComplexity>k__BackingField: 6
+  <MinNumberOfBranches>k__BackingField: 2
+  <MaxNumberOfBranches>k__BackingField: 5
+  <BranchingProba>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.5573169
+      value: 0.13596174
+      inSlope: 0.87136704
+      outSlope: 0.87136704
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.23760366
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

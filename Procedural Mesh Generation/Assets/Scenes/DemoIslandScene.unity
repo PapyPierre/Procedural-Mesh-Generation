@@ -280,8 +280,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GeneratedObjToDebug: []
   m_hideAllGizmos: 0
-  m_showIslandSpine: 0
-  m_showFloorsRadius: 1
+  m_showSpine: 0
+  m_showFloorsRadius: 0
   m_floorColorGradient:
     serializedVersion: 2
     key0: {r: 0.10893297, g: 0, b: 1, a: 1}
@@ -313,12 +313,12 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   m_showFloorLabels: 0
   m_showVertices: 1
-  m_verticesGizmosSize: 0.1
-  m_showVerticesLabels: 1
+  m_verticesGizmosSize: 0.02
+  m_showVerticesLabels: 0
   m_centerGizmosColor: {r: 1, g: 0, b: 0.7686275, a: 1}
   m_tipGizmosColor: {r: 0.10196079, g: 0.11764707, b: 1, a: 1}
   m_showVerticesLinks: 1
-  m_verticesLinksThickness: 2
+  m_verticesLinksThickness: 1
 --- !u!4 &92125870
 Transform:
   m_ObjectHideFlags: 0
@@ -1349,6 +1349,8 @@ MonoBehaviour:
   m_treeGenerationData: {fileID: 11400000, guid: 788d6e60f49dbaa4899def090d03b221,
     type: 2}
   m_generateAt: {x: 0, y: 0, z: 0}
+  testIsland: 0
+  testTree: 1
 --- !u!4 &371688928
 Transform:
   m_ObjectHideFlags: 0

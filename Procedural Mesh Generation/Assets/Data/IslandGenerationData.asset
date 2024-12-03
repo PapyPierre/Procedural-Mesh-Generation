@@ -20,14 +20,15 @@ MonoBehaviour:
   <MaxFloorCount>k__BackingField: 15
   <MinFloorsHeight>k__BackingField: 7
   <MaxFloorsHeight>k__BackingField: 20
-  <MinFloorsRadius>k__BackingField: 4
-  <MaxFloorsRadius>k__BackingField: 8
+  <MinFloorsRadius>k__BackingField: 2
+  <MaxFloorsRadius>k__BackingField: 4
   <FloorsMaxOffset>k__BackingField: 8
   <VerticesMaxOffset>k__BackingField: 1
   <MinDirectionSwelling>k__BackingField: 1
-  <MaxDirectionSwelling>k__BackingField: 2
+  <MaxDirectionSwelling>k__BackingField: 4
   <SwellingDirection>k__BackingField: 1
   <RandomSwellingChance>k__BackingField: 0
   <MinRandomSwelling>k__BackingField: 0
   <MaxRandomSwelling>k__BackingField: 2
   <MeshComplexity>k__BackingField: 15
+  <MaxNumberOfBranches>k__BackingField: 0

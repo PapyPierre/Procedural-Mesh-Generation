@@ -16,52 +16,18 @@ namespace Procedural_Mesh_Generation.Island_Generation
             generatedIslandMeshData.CenterVertex = position;
 
             SetUpFloors(generatedIslandMeshData);
-            SetUpTip(generatedIslandMeshData);
             CreateVertices(generatedIslandMeshData);
+            SetUpTip(generatedIslandMeshData);
 
             return GenerateIslandMesh(generatedIslandMeshData);
         }
 
         private static void SetUpTip(IslandMeshData islandMeshData)
         {
-            Vector3 randomPos = GetFloorPos(islandMeshData.GenerationData, islandMeshData.Floors[^1]);
+            Vector3 randomPos = GetFloorPos(islandMeshData, islandMeshData.Floors[^1]);
             Vector3 lastAnchorPos = islandMeshData.Floors[^1].AnchorPos;
             float y = lastAnchorPos.y - randomPos.y;
             islandMeshData.TipVertex = new Vector3(randomPos.x, y, randomPos.z);
-        }
-
-        private static void CreateVertices(IslandMeshData islandMeshData)
-        {
-            foreach (var floor in islandMeshData.Floors)
-            {
-                var floorRadius = floor.Radius;
-
-                for (int i = 0; i < islandMeshData.GenerationData.MeshComplexity; i++)
-                {
-                    Vector3 vertexPos = GetVertexPos(islandMeshData, floor, floorRadius, i);
-                    islandMeshData.Vertices.Add(vertexPos);
-                }
-            }
-            
-            islandMeshData.Vertices.Add(islandMeshData.CenterVertex);
-            islandMeshData.Vertices.Add(islandMeshData.TipVertex);
-        }
-
-        private static Vector3 GetVertexPos(IslandMeshData islandMeshData, Floor floor, float floorRadius, int index)
-        {
-            float angle = index * 2 * Mathf.PI / islandMeshData.GenerationData.MeshComplexity;
-
-            float x = floor.AnchorPos.x + floorRadius * Mathf.Cos(angle) +
-                      SRnd.RangeFloat(0, islandMeshData.GenerationData.VerticesMaxOffset);
-
-            float y = IsFirstFloor(floor)
-                ? islandMeshData.Floors[0].AnchorPos.y
-                : floor.AnchorPos.y + SRnd.RangeFloat(0, islandMeshData.GenerationData.VerticesMaxOffset / floor.Index);
-
-            float z = floor.AnchorPos.z + floorRadius * Mathf.Sin(angle) + 
-                      SRnd.RangeFloat(0, islandMeshData.GenerationData.VerticesMaxOffset);
-
-            return new Vector3(x, y, z);
         }
 
         private static GeneratedIsland GenerateIslandMesh(IslandMeshData islandMeshData)
@@ -69,14 +35,15 @@ namespace Procedural_Mesh_Generation.Island_Generation
             foreach (var floor in islandMeshData.Floors)
             {
                 AddTrianglesToMeshData(islandMeshData, floor);
+                AddSpecificTriangles(islandMeshData, floor);
             }
             
             return GenerateObj<GeneratedIsland>(CreateMesh(islandMeshData), islandMeshData);
         }
 
-        private static void AddTrianglesToMeshData(IslandMeshData islandMeshData, Floor floor)
+        private static void AddSpecificTriangles(IslandMeshData meshData, Floor floor)
         {
-            int meshComplexity = islandMeshData.GenerationData.MeshComplexity;
+            int meshComplexity = meshData.GenerationData.MeshComplexity;
 
             for (int i = 0; i < meshComplexity; i++)
             {
@@ -85,60 +52,39 @@ namespace Procedural_Mesh_Generation.Island_Generation
                 // If last vertex in floor (need to apply changes for it to loop)
                 if (i == meshComplexity - 1)
                 {
-                    // Ground on island
-                    islandMeshData.Triangles.Add(0);
-                    islandMeshData.Triangles.Add(i);
-                    islandMeshData.Triangles.Add(islandMeshData.Vertices.Count - 2); // Center vertex
-
                     int firstVertexInFloor = floor.Index * meshComplexity;
 
-                    if (IsLastFloor(islandMeshData, floor))
+                    if (meshData.IsLastFloor(floor)) // Connect last floor vertices to tip vertex
                     {
-                        islandMeshData.Triangles.Add(currentVertex);
-                        islandMeshData.Triangles.Add(firstVertexInFloor);
-                        islandMeshData.Triangles.Add(i + floor.Index * meshComplexity + 2);
+                        meshData.Triangles.Add(currentVertex);
+                        meshData.Triangles.Add(firstVertexInFloor);
+                        meshData.Triangles.Add(currentVertex + 2); // Tip vertex
                     }
-                    else
+
+                    if (meshData.IsFirstFloor(floor)) // Draw ground on the island
                     {
-                        int firstVertexInNextFloor = islandMeshData.Floors[floor.Index + 1].Index * meshComplexity;
-                        int currentVertexInNextFloor = i + islandMeshData.Floors[floor.Index + 1].Index * meshComplexity;
-
-                        islandMeshData.Triangles.Add(currentVertex);
-                        islandMeshData.Triangles.Add(firstVertexInFloor);
-                        islandMeshData.Triangles.Add(currentVertexInNextFloor);
-
-                        islandMeshData.Triangles.Add(firstVertexInFloor);
-                        islandMeshData.Triangles.Add(firstVertexInNextFloor);
-                        islandMeshData.Triangles.Add(currentVertexInNextFloor);
+                        meshData.Triangles.Add(0);
+                        meshData.Triangles.Add(i);
+                        meshData.Triangles.Add(meshData.Floors.Count * meshComplexity); // Center vertex
                     }
                 }
                 else
-                {
-                    // Ground on island
-                    islandMeshData.Triangles.Add(i + 1);
-                    islandMeshData.Triangles.Add(i);
-                    islandMeshData.Triangles.Add(islandMeshData.Vertices.Count - 2); // Center vertex
-
+                {              
                     int nextVertexInFloor = i + floor.Index * meshComplexity + 1;
 
-                    if (IsLastFloor(islandMeshData, floor))
+                    if (meshData.IsLastFloor(floor))  // Connect last floor vertices to tip vertex
                     {
-                        islandMeshData.Triangles.Add(currentVertex);
-                        islandMeshData.Triangles.Add(nextVertexInFloor);
-                        islandMeshData.Triangles.Add(islandMeshData.Vertices.Count - 1);
+                        meshData.Triangles.Add(currentVertex);
+                        meshData.Triangles.Add(nextVertexInFloor);
+                        meshData.Triangles.Add((1 + floor.Index) * meshComplexity + 1); // Tip vertex
                     }
-                    else
+
+                    // Ground on island
+                    if (meshData.IsFirstFloor(floor)) // Draw ground on the island
                     {
-                        int currentVertexInNextFloor = i + islandMeshData.Floors[floor.Index + 1].Index * meshComplexity;
-                        int nextVertexInNextFloor = i + islandMeshData.Floors[floor.Index + 1].Index * meshComplexity + 1;
-
-                        islandMeshData.Triangles.Add(currentVertex);
-                        islandMeshData.Triangles.Add(nextVertexInFloor);
-                        islandMeshData.Triangles.Add(currentVertexInNextFloor);
-
-                        islandMeshData.Triangles.Add(nextVertexInFloor);
-                        islandMeshData.Triangles.Add(nextVertexInNextFloor);
-                        islandMeshData.Triangles.Add(currentVertexInNextFloor);
+                        meshData.Triangles.Add(nextVertexInFloor);
+                        meshData.Triangles.Add(currentVertex);
+                        meshData.Triangles.Add(meshData.Floors.Count * meshComplexity); // Center vertex
                     }
                 }
             }

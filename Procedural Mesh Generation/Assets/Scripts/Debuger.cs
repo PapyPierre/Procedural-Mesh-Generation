@@ -8,13 +8,14 @@ using UnityEngine.Serialization;
 public class Debuger : MonoBehaviour
 {
     public static Debuger Instance;
-    
+
     public List<GeneratedObj> GeneratedObjToDebug = new List<GeneratedObj>();
 
     [Header("Global Gizmos")] [SerializeField]
     private bool m_hideAllGizmos;
 
-    [FormerlySerializedAs("m_showIslandSpine")] [SerializeField] private bool m_showSpine;
+    [FormerlySerializedAs("m_showIslandSpine")] [SerializeField]
+    private bool m_showSpine;
 
 
     [Header("Floor Gizmos")] [SerializeField]
@@ -58,7 +59,7 @@ public class Debuger : MonoBehaviour
 
             foreach (var floor in meshData.Floors)
             {
-                if (m_showSpine) DrawSpine(floor, meshData.Floors.Count, GetNextFloorAnchor(floor, meshData));
+                if (m_showSpine && !meshData.IsFirstFloor(floor)) DrawSpine(floor, meshData);
                 if (m_showFloorsRadius) DrawFloorRadius(floor, meshData.Floors.Count);
 
                 if (m_showFloorLabels)
@@ -119,19 +120,22 @@ public class Debuger : MonoBehaviour
 
     private void DrawVertices(MeshData meshData)
     {
-        for (var i = 0; i < meshData.Vertices.Count; i++)
+        foreach (var floor in meshData.Floors)
         {
-            Vector3 vertex = meshData.Vertices[i];
-            Gizmos.color = m_floorColorGradient.Evaluate(-vertex.y / meshData.Vertices.Count);
-            Gizmos.DrawSphere(vertex, m_verticesGizmosSize);
-            if (m_showVerticesLabels) Handles.Label(vertex, "Vextex " + i + " \nPos : " + vertex);
+            for (var i = 0; i < floor.Vertices.Count; i++)
+            {
+                Vector3 vertex = floor.Vertices[i];
+                Gizmos.color = GetFloorColor(floor, meshData.Floors.Count);
+                Gizmos.DrawSphere(vertex, m_verticesGizmosSize);
+                if (m_showVerticesLabels) Handles.Label(vertex, $"Vextex {i} \nPos : {vertex}");
+            }
         }
     }
 
-    private void DrawSpine(Floor floor, int floorCount, Vector3 nextFloorPos)
+    private void DrawSpine(Floor floor, MeshData meshData)
     {
-        Handles.color = GetFloorColor(floor, floorCount);
-        Handles.DrawLine(floor.AnchorPos, nextFloorPos, 3);
+        Handles.color = GetFloorColor(floor, meshData.Floors.Count);
+        Handles.DrawLine(floor.AnchorPos, meshData.GetPreviousFloor(floor).AnchorPos, 3);
     }
 
     private void DrawCenterVertex(Vector3 centerVertexPos)
@@ -148,45 +152,34 @@ public class Debuger : MonoBehaviour
 
     private void DrawVerticesLinks(MeshData meshData)
     {
-        for (int i = 0; i < meshData.Vertices.Count; i++)
+        foreach (var floor in meshData.Floors)
         {
-            Vector3 vertex = meshData.Vertices[i];
-
-            Handles.color = m_floorColorGradient.Evaluate(-vertex.y / meshData.Vertices.Count);
-
-            // If first floor, draw to island center
-            if (i < meshData.GenerationData.MeshComplexity)
+            for (int i = 0; i < floor.Vertices.Count; i++)
             {
-                Handles.DrawLine(vertex, meshData.CenterVertex, m_verticesLinksThickness);
-            }
+                Vector3 vertex = floor.Vertices[i];
 
-            // Draw to next vertex in floor
-            if ((i + 1) % meshData.GenerationData.MeshComplexity == 0)
-            {
-                Handles.DrawLine(vertex, meshData.Vertices[i - (meshData.GenerationData.MeshComplexity - 1)],
+                Handles.color = GetFloorColor(floor, meshData.Floors.Count);
+
+                Handles.DrawLine(vertex, i == floor.Vertices.Count - 1 ? floor.Vertices[0] : floor.Vertices[i + 1],
                     m_verticesLinksThickness);
-            }
-            else
-            {
-                if (i < meshData.Vertices.Count - 2)
+
+                // If first floor, draw to center vertex
+                if (meshData.IsFirstFloor(floor))
                 {
-                    Handles.DrawLine(vertex, meshData.Vertices[i + 1], m_verticesLinksThickness);
+                    Handles.DrawLine(vertex, meshData.CenterVertex, m_verticesLinksThickness);
                 }
-            }
-
-            // Draw to same vertex in next floor, or if last floor to tip vertex
-            if (i < meshData.GenerationData.MeshComplexity * (meshData.Floors.Count - 1))
-            {
-                Handles.DrawLine(vertex, meshData.Vertices[i + meshData.GenerationData.MeshComplexity],
-                    m_verticesLinksThickness);
-            }
-            else
-            {
-                if (vertex != meshData.CenterVertex)
+                else
                 {
-                    if (meshData is IslandMeshData islandMeshData)
+                    if (meshData.IsLastFloor(floor) && meshData is IslandMeshData islandMeshData)
                     {
                         Handles.DrawLine(vertex, islandMeshData.TipVertex, m_verticesLinksThickness);
+                    }
+            
+                    Floor previousFloor = meshData.GetPreviousFloor(floor);
+
+                    if (i <  previousFloor.Vertices.Count)
+                    {
+                        Handles.DrawLine(vertex, previousFloor.Vertices[i], m_verticesLinksThickness);
                     }
                 }
             }
