@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using NaughtyAttributes;
 using Procedural_Mesh_Generation.Island_Generation;
 using Procedural_Mesh_Generation.Tree_Generation;
 using UnityEngine;
@@ -10,12 +11,21 @@ namespace Demo
         [SerializeField] private IslandGenerationData m_islandGenerationData;
         [SerializeField] private TreeGenerationData m_treeGenerationData;
         [SerializeField] private Vector3 m_generateAt;
+        [SerializeField] private Vector3 m_generateAt2;
 
         [SerializeField] private bool testIsland;
         [SerializeField] private bool testTree;
         
-        private IEnumerator Start()
+        [Button]
+        private void Generate()
         {
+            foreach (var obj in Debuger.Instance.GeneratedObjToDebug)
+            {
+                Destroy(obj.gameObject);
+            }
+            
+            Debuger.Instance.GeneratedObjToDebug.Clear();
+            
             if (testIsland)
             {
                 GeneratedIsland island = IslandMeshGenerator.GenerateIsland(m_generateAt, m_islandGenerationData);
@@ -24,20 +34,9 @@ namespace Demo
 
             if (testTree)
             {
-                GeneratedTree tree = TreeMeshGenerator.GenerateTree(m_generateAt, m_treeGenerationData);
+                GeneratedTree tree = TreeMeshGenerator.GenerateTree(m_generateAt2, m_treeGenerationData);
                 Debuger.Instance.GeneratedObjToDebug.Add(tree);
             }
-            
-            yield return null;
-            
-            /*
-            for (int i = 0; i < 100; i++)
-            {
-                GameObject lastIsland = IslandMeshGenerator.GenerateIsland(m_generateAt, m_generationData);
-                yield return new WaitForSeconds(5);
-                Destroy(lastIsland);
-            }
-            */
         }
     }
 }

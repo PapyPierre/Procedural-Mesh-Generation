@@ -8,12 +8,12 @@ namespace Procedural_Mesh_Generation.Tree_Generation
         {
             TreeMeshData generatedTreeMeshData = new TreeMeshData
             {
-                GenerationData = data
+                GenData = data
             };
             
             InitSeed(seed);
          
-            generatedTreeMeshData.CenterVertex = position;
+            generatedTreeMeshData.CenterVertex = generatedTreeMeshData.PivotVertex = position;
 
             SetUpFloors(generatedTreeMeshData);
             CreateVertices(generatedTreeMeshData);

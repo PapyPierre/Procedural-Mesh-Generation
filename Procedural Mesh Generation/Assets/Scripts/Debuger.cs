@@ -64,33 +64,23 @@ public class Debuger : MonoBehaviour
 
                 if (m_showFloorLabels)
                 {
-                    string floorTextLabel = $"Floor {floor.Index}\nPos: {floor.AnchorPos}\nRadius: {floor.Radius}";
-                    Handles.Label(floor.AnchorPos, floorTextLabel);
+                    DrawFloorLabels(floor);
                 }
             }
 
-            if (m_showVertices) DrawVertices(meshData);
-            if (m_showVerticesLinks) DrawVerticesLinks(meshData);
-
             if (m_showVertices)
             {
+                DrawVertices(meshData);
+
                 DrawCenterVertex(meshData.CenterVertex);
 
                 if (meshData is IslandMeshData islandMeshData)
                 {
-                    DrawTipVertex(islandMeshData.TipVertex);
+                    DrawTipVertex(islandMeshData.PivotVertex);
                 }
             }
 
-            if (m_showVerticesLabels)
-            {
-                Handles.Label(meshData.CenterVertex, "Center \nPos : " + meshData.CenterVertex);
-
-                if (meshData is IslandMeshData islandMeshData)
-                {
-                    Handles.Label(islandMeshData.TipVertex, "Tip \nPos : " + islandMeshData.TipVertex);
-                }
-            }
+            if (m_showVerticesLinks) DrawVerticesLinks(meshData);
         }
     }
 
@@ -99,7 +89,7 @@ public class Debuger : MonoBehaviour
         if (meshData is IslandMeshData islandMeshData)
         {
             return floor.Index == meshData.Floors.Count - 1
-                ? islandMeshData.TipVertex
+                ? islandMeshData.PivotVertex
                 : meshData.Floors[floor.Index + 1].AnchorPos;
         }
 
@@ -110,6 +100,23 @@ public class Debuger : MonoBehaviour
     {
         Handles.color = GetFloorColor(floor, floorCount);
         Handles.DrawWireDisc(floor.AnchorPos, Vector3.up, floor.Radius, 3);
+    }
+
+    private void DrawFloorLabels(Floor floor)
+    {
+        string floorTextLabel = $"Floor {floor.Index}" +
+                                $"\nDepth: {floor.DepthIndex}" +
+                                $"\nPos: {floor.AnchorPos}" +
+                                $"\nRadius: {floor.Radius}" +
+                                $"\nPrevious Floor Index: {floor.PreviousFloorIndex}" +
+                                $"\nNext Floors Index:";
+
+        foreach (int index in floor.NextFloorsIndex)
+        {
+            floorTextLabel += $"\n {index}";
+        }
+        
+        Handles.Label(floor.AnchorPos, floorTextLabel);
     }
 
     private Color GetFloorColor(Floor floor, int floorCount)
@@ -130,12 +137,22 @@ public class Debuger : MonoBehaviour
                 if (m_showVerticesLabels) Handles.Label(vertex, $"Vextex {i} \nPos : {vertex}");
             }
         }
+
+        if (m_showVerticesLabels)
+        {
+            Handles.Label(meshData.CenterVertex, "Center \nPos : " + meshData.CenterVertex);
+
+            if (meshData is IslandMeshData islandMeshData)
+            {
+                Handles.Label(islandMeshData.PivotVertex, "Tip \nPos : " + islandMeshData.PivotVertex);
+            }
+        }
     }
 
     private void DrawSpine(Floor floor, MeshData meshData)
     {
         Handles.color = GetFloorColor(floor, meshData.Floors.Count);
-        Handles.DrawLine(floor.AnchorPos, meshData.GetPreviousFloor(floor).AnchorPos, 3);
+        Handles.DrawLine(floor.AnchorPos,  meshData.GetPreviousFloor(floor).AnchorPos, 3);
     }
 
     private void DrawCenterVertex(Vector3 centerVertexPos)
@@ -172,12 +189,12 @@ public class Debuger : MonoBehaviour
                 {
                     if (meshData.IsLastFloor(floor) && meshData is IslandMeshData islandMeshData)
                     {
-                        Handles.DrawLine(vertex, islandMeshData.TipVertex, m_verticesLinksThickness);
+                        Handles.DrawLine(vertex, islandMeshData.PivotVertex, m_verticesLinksThickness);
                     }
-            
+
                     Floor previousFloor = meshData.GetPreviousFloor(floor);
 
-                    if (i <  previousFloor.Vertices.Count)
+                    if (i < previousFloor.Vertices.Count)
                     {
                         Handles.DrawLine(vertex, previousFloor.Vertices[i], m_verticesLinksThickness);
                     }

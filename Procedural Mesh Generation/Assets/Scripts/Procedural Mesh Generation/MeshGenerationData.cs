@@ -25,24 +25,28 @@ namespace Procedural_Mesh_Generation
 
         [field: SerializeField, Tooltip("maximal space between floors")]
         internal float MaxFloorsHeight { get; private set; }
+        
+        [field: SerializeField]
+        internal bool HeightBetweenCenterAndFirstFloor { get; private set; }
 
         [field: SerializeField, Space] internal float MinFloorsRadius { get; private set; }
         [field: SerializeField] internal float MaxFloorsRadius { get; private set; }
 
-        [field: SerializeField, Space, Tooltip("maximal floors offset on x and z axis")]
-        internal AnimationCurve FloorsMaxOffsetAlongObj { get; private set; }
+        [field: SerializeField, Space]
+        internal AnimationCurve FloorsOffsetAlongVerticalAxis { get; private set; }
+        
+        [field: SerializeField] internal float FloorsOffesetImpact { get; private set; }
 
+        [field: SerializeField] internal float GenDirImpact { get; private set; }
+        
         [field: Header("Vertices"), SerializeField, Tooltip("maximal vertices offset on all axis")]
         internal float VerticesMaxOffset { get; private set; }
 
-        [field: Header("Swelling"), SerializeField, Tooltip("Impact floor radius depending on swelling direction.")]
-        internal float MinDirectionSwelling { get; private set; }
-
-        [field: SerializeField, Tooltip("Impact floor radius depending on swelling direction.")]
-        internal float MaxDirectionSwelling { get; private set; }
-
-        [field: SerializeField, Tooltip("If the mesh should generation himself upward or downward")]
-        internal GenerationDirection SwellingDirection { get; private set; }
+        [field: Header("Swelling"), SerializeField, Tooltip("Impact floor radius along vertical axis.")]
+        internal AnimationCurve SwellingAlongVerticalAxis { get; private set; }
+        
+        [field: SerializeField]
+        internal float SwellingImpact { get; private set; }
         
         [field: SerializeField, Range(0,100), Tooltip("% of chance to apply random Swelling on each floor")]
         internal float RandomSwellingChance { get; private set; }
@@ -57,18 +61,9 @@ namespace Procedural_Mesh_Generation
         internal int MeshComplexity { get; private set; }
 
         [field: SerializeField, Header("Branch")]
-        internal int MinNumberOfBranches { get; private set; }
-        
-        [field: SerializeField]
         internal int MaxNumberOfBranches { get; private set; }
         
         [field: SerializeField]
-        internal AnimationCurve BranchingProba { get; private set; }
-    }
-
-    public enum GenerationDirection
-    {
-        Upward,
-        Downward
+        internal AnimationCurve BranchProba { get; private set; }
     }
 }

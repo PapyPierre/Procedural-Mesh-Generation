@@ -20,15 +20,78 @@ MonoBehaviour:
   <MaxFloorCount>k__BackingField: 15
   <MinFloorsHeight>k__BackingField: 7
   <MaxFloorsHeight>k__BackingField: 20
+  <HeightBetweenCenterAndFirstFloor>k__BackingField: 1
   <MinFloorsRadius>k__BackingField: 2
   <MaxFloorsRadius>k__BackingField: 4
-  <FloorsMaxOffset>k__BackingField: 8
+  <FloorsOffsetAlongVerticalAxis>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  <FloorsOffesetImpact>k__BackingField: 1
+  <PreviousFloorPosWeight>k__BackingField: 1
   <VerticesMaxOffset>k__BackingField: 1
-  <MinDirectionSwelling>k__BackingField: 1
-  <MaxDirectionSwelling>k__BackingField: 4
-  <SwellingDirection>k__BackingField: 1
+  <SwellingAlongVerticalAxis>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.2
+      inSlope: 1.5857308
+      outSlope: 1.5857308
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.06779586
+    - serializedVersion: 3
+      time: 0.99160767
+      value: 0.9976425
+      inSlope: 0.39290884
+      outSlope: 0.39290884
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.21187316
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  <SwellingImpact>k__BackingField: 20
   <RandomSwellingChance>k__BackingField: 0
   <MinRandomSwelling>k__BackingField: 0
   <MaxRandomSwelling>k__BackingField: 2
   <MeshComplexity>k__BackingField: 15
   <MaxNumberOfBranches>k__BackingField: 0
+  <BranchingProba>k__BackingField:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0.9907837
+      value: 0
+      inSlope: -0.0027749862
+      outSlope: -0.0027749862
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
