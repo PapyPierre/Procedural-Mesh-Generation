@@ -8,6 +8,8 @@ namespace Procedural_Mesh_Generation
     public class Floor
     {
         public int Index;
+        public int BranchIndex;
+        public int IndexInBranch;
         public int DepthIndex; // How many previous floor has this floor
         public Vector3 AnchorPos;
         public float Radius;

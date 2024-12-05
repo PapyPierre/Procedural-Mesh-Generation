@@ -17,30 +17,66 @@ namespace Procedural_Mesh_Generation
 
         protected static void SetUpFloors(MeshData meshData)
         {
-            int floorCount = SRnd.RangeInt(meshData.GenData.MinFloorCount,
-                meshData.GenData.MaxFloorCount + 1);
+            int floorCount = SRnd.RangeInt(meshData.GenData.MinFloorCount, meshData.GenData.MaxFloorCount + 1);
 
-            int branching = 0;
+            GenerateFloors(meshData, floorCount);
 
-            GenerateFloors(meshData, floorCount, ref branching, 0, floorCount);
+            float baseRadius = SRnd.RangeFloat(meshData.GenData.MinFloorsRadius, meshData.GenData.MaxFloorsRadius);
 
-            float tempRadius = SRnd.RangeFloat(meshData.GenData.MinFloorsRadius,
-                meshData.GenData.MaxFloorsRadius);
-
-            Vector2 genDirection = new Vector2(SRnd.RangeFloat(0, 1), SRnd.RangeFloat(0, 1));
-            float genDirImpact = meshData.GenData.GenDirImpact;
-            
             foreach (var floor in meshData.Floors)
             {
-                SetFloorAnchor(meshData, floor, genDirection);
-                UpdateGenerationDirection(ref genDirection, genDirImpact);
-                SetFloorRadius(meshData, floor, tempRadius);
+                SetFloorAnchor(meshData, floor);
+                SetFloorRadius(meshData, floor, baseRadius);
             }
         }
 
-        private static void GenerateFloors(MeshData meshData, int floorCountToGenerate, ref int branchCount,
-            int baseIndexOfNewBranch, int totalFloorCount)
+        private static void GenerateFloors(MeshData meshData, int floorCountToGenerate)
         {
+            List<Floor> originFloorForNextBranches = new List<Floor>();
+            List<Floor> nextOriginFloors = new List<Floor>();
+
+            for (int i = 0; i < floorCountToGenerate; i++)
+            {
+                int branchToGenerate = meshData.GenData.BranchMultiplicator;
+
+                if (i == 0)
+                {
+                    int floorCountInBranch = SRnd.RangeInt(meshData.GenData.MinFloorCountInBranch,
+                        meshData.GenData.MaxFloorCountInBranch + 1);
+
+                    GenerateBranch(meshData, floorCountInBranch, 0, null,
+                        out Floor lastFloorOfTrunk);
+
+                    floorCountToGenerate -= floorCountInBranch;
+
+                    nextOriginFloors.Add(lastFloorOfTrunk);
+                }
+
+                foreach (var originFloorForNewBranch in originFloorForNextBranches)
+                {
+                    for (int j = 0; j < branchToGenerate; j++)
+                    {
+                        int floorCountInBranch = SRnd.RangeInt(meshData.GenData.MinFloorCountInBranch,
+                            meshData.GenData.MaxFloorCountInBranch + 1);
+
+                        GenerateBranch(meshData, floorCountInBranch, i + j, originFloorForNewBranch,
+                            out Floor lastFloorOfBranch);
+
+                        floorCountToGenerate -= floorCountInBranch;
+
+                        nextOriginFloors.Add(lastFloorOfBranch);
+                    }
+                }
+
+                foreach (var floor in nextOriginFloors)
+                {
+                    originFloorForNextBranches.Add(floor);
+                }
+
+                nextOriginFloors.Clear();
+            }
+
+            /*
             for (int i = 0; i < floorCountToGenerate; i++)
             {
                 Floor floor = new Floor
@@ -53,12 +89,13 @@ namespace Procedural_Mesh_Generation
                 meshData.Floors.Add(floor);
 
                 float branchProba = meshData.GenData.BranchProba.Evaluate((float)floor.DepthIndex / totalFloorCount);
-                int maxBranchCount = meshData.GenData.MaxNumberOfBranches;
+                bool canBranch = meshData.GenData.minFloorCountBetweenBranching <= floor.Index;
                 int floorLeftToGen = floorCountToGenerate - i;
-                
-                if (branchCount < maxBranchCount && floorLeftToGen > 3 && SRnd.RangeFloat(0f, 1f) <= branchProba)
+
+                if (canBranch && floorLeftToGen > 3 && SRnd.RangeFloat(0f, 1f) <= branchProba)
                 {
                     branchCount++;
+                    floor.IsBranch = true;
 
                     GenerateFloors(meshData, floorLeftToGen / 3, ref branchCount, floor.Index, totalFloorCount);
 
@@ -71,18 +108,43 @@ namespace Procedural_Mesh_Generation
                     return;
                 }
             }
+            */
         }
 
-        private static void SetFloorInfos(MeshData meshData, Floor floor, int i, int baseIndexOfNewBranch)
+        private static void GenerateBranch(MeshData meshData, int floorCountToGenerateInBranch,
+            int indexOfBranch, Floor originFloor, out Floor lastFloorInBranch)
         {
-            if (i == 0)
-            {
-                if (baseIndexOfNewBranch != 0) // First floor of new branch
-                {
-                    floor.PreviousFloorIndex = meshData.Floors[baseIndexOfNewBranch].Index;
-                    meshData.Floors[baseIndexOfNewBranch].NextFloorsIndex.Add(floor.Index);
+            lastFloorInBranch = null;
 
-                    floor.DepthIndex = baseIndexOfNewBranch + 1;
+            for (int i = 0; i < floorCountToGenerateInBranch; i++)
+            {
+                Floor floor = new Floor
+                {
+                    Index = meshData.Floors.Count
+                };
+
+                SetFloorInfos(meshData, floor, i, indexOfBranch, originFloor);
+
+                meshData.Floors.Add(floor);
+
+                lastFloorInBranch = floor;
+            }
+        }
+
+        private static void SetFloorInfos(MeshData meshData, Floor floor, int indexInBranch, int branchIndex,
+            Floor branchOriginFloor)
+        {
+            floor.IndexInBranch = indexInBranch;
+            floor.BranchIndex = branchIndex;
+
+            if (indexInBranch == 0)
+            {
+                if (branchIndex != 0) // First floor of new branch
+                {
+                    floor.PreviousFloorIndex = branchOriginFloor.Index;
+                    branchOriginFloor.NextFloorsIndex.Add(floor.Index);
+
+                    floor.DepthIndex = branchOriginFloor.Index + 1;
                 }
                 else // First floor
                 {
@@ -91,46 +153,36 @@ namespace Procedural_Mesh_Generation
             }
             else // Other floors
             {
-                if (baseIndexOfNewBranch != 0)
-                {
-                    floor.PreviousFloorIndex = meshData.Floors[baseIndexOfNewBranch + i].Index;
-                    meshData.Floors[baseIndexOfNewBranch + i].NextFloorsIndex.Add(floor.Index);
+                floor.PreviousFloorIndex = meshData.Floors[floor.Index - 1].Index;
+                meshData.Floors[floor.Index - 1].NextFloorsIndex.Add(floor.Index);
 
-                    floor.DepthIndex = baseIndexOfNewBranch + i + 1;
+                if (branchIndex != 0)
+                {
+                    floor.DepthIndex = branchOriginFloor.Index + indexInBranch + 1;
                 }
                 else
                 {
-                    floor.PreviousFloorIndex = meshData.Floors[i - 1].Index;
-                    meshData.Floors[i - 1].NextFloorsIndex.Add(floor.Index);
-
-                    floor.DepthIndex = i;
+                    floor.DepthIndex = indexInBranch + 1;
                 }
             }
         }
 
-        private static void SetFloorAnchor(MeshData meshData, Floor floor, Vector2 genDir)
+        private static void SetFloorAnchor(MeshData meshData, Floor floor)
         {
-            Vector3 previousFloorAnchorPos = meshData.IsFirstFloor(floor)
-                ? meshData.CenterVertex
-                : meshData.GetPreviousFloor(floor).AnchorPos;
+            Floor previousFloor = meshData.IsFirstFloor(floor) ? floor : meshData.GetPreviousFloor(floor);
 
-            Vector3 randomPos = GetFloorPos(meshData, floor, previousFloorAnchorPos, genDir);
+            Vector3 randomPos = ComputeFloorPos(meshData, floor, previousFloor);
 
             float y = meshData.CenterVertex.y;
 
             if (!meshData.IsFirstFloor(floor) || meshData.GenData.HeightBetweenCenterAndFirstFloor)
             {
-                y = previousFloorAnchorPos.y + randomPos.y;
+                y = previousFloor.AnchorPos.y + randomPos.y;
             }
 
             floor.AnchorPos = new Vector3(randomPos.x, y, randomPos.z);
         }
 
-        private static void UpdateGenerationDirection(ref Vector2 genDir, float impact)
-        {
-            genDir += new Vector2(SRnd.RangeFloat(0, impact), SRnd.RangeFloat(0, impact)) * 2;
-            genDir /= 3;
-        }
 
         private static void SetFloorRadius(MeshData meshData, Floor floor, float tempRadius)
         {
@@ -150,16 +202,41 @@ namespace Procedural_Mesh_Generation
             floor.Radius = radius;
         }
 
-        private static Vector3 GetFloorPos(MeshData meshData, Floor currentFloor, Vector3 prevFloorPos, Vector2 genDir)
+        private static Vector3 ComputeFloorPos(MeshData meshData, Floor currentFloor, Floor previousFloor)
         {
             float height = SRnd.RangeFloat(meshData.GenData.MinFloorsHeight, meshData.GenData.MaxFloorsHeight);
 
-            float t = (float)currentFloor.DepthIndex / meshData.Floors.Count;
-            float offsetValue = meshData.GenData.FloorsOffsetAlongVerticalAxis.Evaluate(t);
-            offsetValue *= meshData.GenData.FloorsOffesetImpact;
+            float t = previousFloor.AnchorPos.y / meshData.Floors.Count * meshData.GenData.MaxFloorsHeight;
+            float randomOffsetValue = meshData.GenData.FloorsOffsetAlongVerticalAxis.Evaluate(t);
 
-            float xOffset = SRnd.RangeFloat(-offsetValue, offsetValue) + prevFloorPos.x + genDir.x;
-            float zOffset = SRnd.RangeFloat(-offsetValue, offsetValue) + prevFloorPos.z + genDir.y;
+            float xOffset = 0;
+            float zOffset = 0;
+
+            if (currentFloor.IndexInBranch == 0)
+            {
+                randomOffsetValue *= meshData.GenData.FloorsOffesetImpact;
+
+                xOffset = previousFloor.AnchorPos.x;
+                zOffset = previousFloor.AnchorPos.z;
+            }
+            else
+            {
+                if (currentFloor.BranchIndex != 0)
+                {
+                    Vector3 branchDir =
+                        (previousFloor.AnchorPos - meshData.Floors[previousFloor.PreviousFloorIndex].AnchorPos)
+                        .normalized;
+
+                    xOffset = branchDir.x * meshData.GenData.BranchDirMultiplicator;
+                    zOffset = branchDir.z + meshData.GenData.BranchDirMultiplicator;
+                }
+            }
+
+            if (currentFloor.BranchIndex == 0 || currentFloor.IndexInBranch == 0)
+            {
+                xOffset += SRnd.RangeFloat(-randomOffsetValue, randomOffsetValue);
+                zOffset += SRnd.RangeFloat(-randomOffsetValue, randomOffsetValue);
+            }
 
             return new Vector3(xOffset, height, zOffset);
         }

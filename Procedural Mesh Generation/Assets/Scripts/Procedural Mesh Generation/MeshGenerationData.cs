@@ -14,6 +14,7 @@ namespace Procedural_Mesh_Generation
         [field: SerializeField] 
         public Material Material { get; private set; }
         
+        
         [field: Header("Floors parameters"), SerializeField, Tooltip("minimal number of floors")]
         internal int MinFloorCount { get; private set; }
 
@@ -37,11 +38,11 @@ namespace Procedural_Mesh_Generation
         
         [field: SerializeField] internal float FloorsOffesetImpact { get; private set; }
 
-        [field: SerializeField] internal float GenDirImpact { get; private set; }
         
         [field: Header("Vertices"), SerializeField, Tooltip("maximal vertices offset on all axis")]
         internal float VerticesMaxOffset { get; private set; }
 
+        
         [field: Header("Swelling"), SerializeField, Tooltip("Impact floor radius along vertical axis.")]
         internal AnimationCurve SwellingAlongVerticalAxis { get; private set; }
         
@@ -60,8 +61,21 @@ namespace Procedural_Mesh_Generation
         [field: SerializeField, Tooltip("Number of vertices per floor")]
         internal int MeshComplexity { get; private set; }
 
-        [field: SerializeField, Header("Branch")]
+        
+        [field:  Header("Branch"), SerializeField]
         internal int MaxNumberOfBranches { get; private set; }
+
+        [field: SerializeField] 
+        internal int MinFloorCountInBranch { get; private set; }
+        
+        [field: SerializeField] 
+        internal int MaxFloorCountInBranch { get; private set; }
+        
+        [field: SerializeField] 
+        internal int BranchMultiplicator { get; private set; }
+        
+        [field: SerializeField] 
+        internal int BranchDirMultiplicator { get; private set; }
         
         [field: SerializeField]
         internal AnimationCurve BranchProba { get; private set; }
