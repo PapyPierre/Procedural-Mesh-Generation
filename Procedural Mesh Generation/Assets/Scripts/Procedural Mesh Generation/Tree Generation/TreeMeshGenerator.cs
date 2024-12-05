@@ -2,7 +2,7 @@
 
 namespace Procedural_Mesh_Generation.Tree_Generation
 {
-    public class TreeMeshGenerator : MeshGenerator
+    public abstract class TreeMeshGenerator : MeshGenerator
     {
         public static GeneratedTree GenerateTree(Vector3 position, TreeGenerationData data, uint seed = 0)
         {
@@ -11,10 +11,10 @@ namespace Procedural_Mesh_Generation.Tree_Generation
                 GenData = data
             };
             
-            InitSeed(seed);
+            GameManager.InitSeed(seed);
          
-            generatedTreeMeshData.CenterVertex = generatedTreeMeshData.PivotVertex = position;
-
+            generatedTreeMeshData.GenerationPoint = generatedTreeMeshData.PivotVertex = position;
+            
             SetUpFloors(generatedTreeMeshData);
             CreateVertices(generatedTreeMeshData);
 

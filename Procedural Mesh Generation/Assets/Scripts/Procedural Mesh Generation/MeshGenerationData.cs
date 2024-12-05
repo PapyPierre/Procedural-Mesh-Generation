@@ -1,5 +1,4 @@
-﻿using NaughtyAttributes;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Procedural_Mesh_Generation
 {
@@ -28,13 +27,13 @@ namespace Procedural_Mesh_Generation
         internal float MaxFloorsHeight { get; private set; }
         
         [field: SerializeField]
-        internal bool HeightBetweenCenterAndFirstFloor { get; private set; }
+        internal bool HeightBetweenGenPointAndFirstFloor { get; private set; }
 
         [field: SerializeField, Space] internal float MinFloorsRadius { get; private set; }
         [field: SerializeField] internal float MaxFloorsRadius { get; private set; }
 
-        [field: SerializeField, Space]
-        internal AnimationCurve FloorsOffsetAlongVerticalAxis { get; private set; }
+        [field: SerializeField, Space, Tooltip("Floors offset depending on their height (y axis)")]
+        internal AnimationCurve HeightBasedFloorsOffset { get; private set; }
         
         [field: SerializeField] internal float FloorsOffesetImpact { get; private set; }
 
@@ -44,7 +43,7 @@ namespace Procedural_Mesh_Generation
 
         
         [field: Header("Swelling"), SerializeField, Tooltip("Impact floor radius along vertical axis.")]
-        internal AnimationCurve SwellingAlongVerticalAxis { get; private set; }
+        internal AnimationCurve Swelling { get; private set; }
         
         [field: SerializeField]
         internal float SwellingImpact { get; private set; }
@@ -63,9 +62,6 @@ namespace Procedural_Mesh_Generation
 
         
         [field:  Header("Branch"), SerializeField]
-        internal int MaxNumberOfBranches { get; private set; }
-
-        [field: SerializeField] 
         internal int MinFloorCountInBranch { get; private set; }
         
         [field: SerializeField] 
@@ -75,9 +71,6 @@ namespace Procedural_Mesh_Generation
         internal int BranchMultiplicator { get; private set; }
         
         [field: SerializeField] 
-        internal int BranchDirMultiplicator { get; private set; }
-        
-        [field: SerializeField]
-        internal AnimationCurve BranchProba { get; private set; }
+        internal float BranchDirectionWeight { get; private set; }
     }
 }

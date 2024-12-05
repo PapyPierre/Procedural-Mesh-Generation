@@ -11,14 +11,14 @@ namespace Procedural_Mesh_Generation.Island_Generation
                 GenData = data
             };
 
-            InitSeed(seed);
+            GameManager.InitSeed(seed);
                 
-            generatedIslandMeshData.CenterVertex = position;
+            generatedIslandMeshData.GenerationPoint = position;
 
             SetUpFloors(generatedIslandMeshData);
             CreateVertices(generatedIslandMeshData);
           
-            generatedIslandMeshData.PivotVertex = generatedIslandMeshData.Floors[^1].AnchorPos;
+            generatedIslandMeshData.PivotVertex = generatedIslandMeshData.Floors[^1].Pos;
 
             return GenerateIslandMesh(generatedIslandMeshData);
         }

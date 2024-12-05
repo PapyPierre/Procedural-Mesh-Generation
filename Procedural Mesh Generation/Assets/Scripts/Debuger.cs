@@ -72,7 +72,7 @@ public class Debuger : MonoBehaviour
             {
                 DrawVertices(meshData);
 
-                DrawCenterVertex(meshData.CenterVertex);
+                DrawCenterVertex(meshData.GenerationPoint);
 
                 if (meshData is IslandMeshData islandMeshData)
                 {
@@ -90,23 +90,24 @@ public class Debuger : MonoBehaviour
         {
             return floor.Index == meshData.Floors.Count - 1
                 ? islandMeshData.PivotVertex
-                : meshData.Floors[floor.Index + 1].AnchorPos;
+                : meshData.Floors[floor.Index + 1].Pos;
         }
 
-        return meshData.Floors[floor.Index + 1].AnchorPos;
+        return meshData.Floors[floor.Index + 1].Pos;
     }
 
     private void DrawFloorRadius(Floor floor, int floorCount)
     {
         Handles.color = GetFloorColor(floor, floorCount);
-        Handles.DrawWireDisc(floor.AnchorPos, Vector3.up, floor.Radius, 3);
+        Gizmos.DrawRay(floor.Pos, floor.Normal);
+        Handles.DrawWireDisc(floor.Pos, floor.Normal, floor.Radius, 3);
     }
 
     private void DrawFloorLabels(Floor floor)
     {
         string floorTextLabel = $"Floor {floor.Index}" +
                                 $"\nDepth: {floor.DepthIndex}" +
-                                $"\nPos: {floor.AnchorPos}" +
+                                $"\nPos: {floor.Pos}" +
                                 $"\nRadius: {floor.Radius}" +
                                 $"\nPrevious Floor Index: {floor.PreviousFloorIndex}" +
                                 $"\nNext Floors Index:";
@@ -116,7 +117,7 @@ public class Debuger : MonoBehaviour
             floorTextLabel += $"\n {index}";
         }
         
-        Handles.Label(floor.AnchorPos, floorTextLabel);
+        Handles.Label(floor.Pos, floorTextLabel);
     }
 
     private Color GetFloorColor(Floor floor, int floorCount)
@@ -140,7 +141,7 @@ public class Debuger : MonoBehaviour
 
         if (m_showVerticesLabels)
         {
-            Handles.Label(meshData.CenterVertex, "Center \nPos : " + meshData.CenterVertex);
+            Handles.Label(meshData.GenerationPoint, "Center \nPos : " + meshData.GenerationPoint);
 
             if (meshData is IslandMeshData islandMeshData)
             {
@@ -152,7 +153,7 @@ public class Debuger : MonoBehaviour
     private void DrawSpine(Floor floor, MeshData meshData)
     {
         Handles.color = GetFloorColor(floor, meshData.Floors.Count);
-        Handles.DrawLine(floor.AnchorPos,  meshData.GetPreviousFloor(floor).AnchorPos, 3);
+        Handles.DrawLine(floor.Pos,  meshData.GetPreviousFloor(floor).Pos, 3);
     }
 
     private void DrawCenterVertex(Vector3 centerVertexPos)
@@ -183,7 +184,7 @@ public class Debuger : MonoBehaviour
                 // If first floor, draw to center vertex
                 if (meshData.IsFirstFloor(floor))
                 {
-                    Handles.DrawLine(vertex, meshData.CenterVertex, m_verticesLinksThickness);
+                    Handles.DrawLine(vertex, meshData.GenerationPoint, m_verticesLinksThickness);
                 }
                 else
                 {

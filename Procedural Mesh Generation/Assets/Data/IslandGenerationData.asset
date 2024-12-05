@@ -18,80 +18,67 @@ MonoBehaviour:
     type: 2}
   <MinFloorCount>k__BackingField: 6
   <MaxFloorCount>k__BackingField: 15
-  <MinFloorsHeight>k__BackingField: 7
+  <MinFloorsHeight>k__BackingField: 15
   <MaxFloorsHeight>k__BackingField: 20
-  <HeightBetweenCenterAndFirstFloor>k__BackingField: 1
+  <HeightBetweenGenPointAndFirstFloor>k__BackingField: 1
   <MinFloorsRadius>k__BackingField: 2
   <MaxFloorsRadius>k__BackingField: 4
-  <FloorsOffsetAlongVerticalAxis>k__BackingField:
+  <HeightBasedFloorsOffset>k__BackingField:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: -1
+      outSlope: -1
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      value: 0
+      inSlope: -1
+      outSlope: -1
       tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  <FloorsOffesetImpact>k__BackingField: 1
-  <PreviousFloorPosWeight>k__BackingField: 1
+  <FloorsOffesetImpact>k__BackingField: 30
   <VerticesMaxOffset>k__BackingField: 1
   <SwellingAlongVerticalAxis>k__BackingField:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0.2
-      inSlope: 1.5857308
-      outSlope: 1.5857308
+      value: 0.5
+      inSlope: 0.53146315
+      outSlope: 0.53146315
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.06779586
+      outWeight: 0.197479
     - serializedVersion: 3
-      time: 0.99160767
-      value: 0.9976425
-      inSlope: 0.39290884
-      outSlope: 0.39290884
+      time: 1
+      value: 1
+      inSlope: 0.9650347
+      outSlope: 0.9650347
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.21187316
+      inWeight: 0.07983196
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  <SwellingImpact>k__BackingField: 20
+  <SwellingImpact>k__BackingField: 9.7
   <RandomSwellingChance>k__BackingField: 0
   <MinRandomSwelling>k__BackingField: 0
   <MaxRandomSwelling>k__BackingField: 2
   <MeshComplexity>k__BackingField: 15
-  <MaxNumberOfBranches>k__BackingField: 0
-  <BranchingProba>k__BackingField:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0.9907837
-      value: 0
-      inSlope: -0.0027749862
-      outSlope: -0.0027749862
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 1
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  <MinFloorCountInBranch>k__BackingField: 2
+  <MaxFloorCountInBranch>k__BackingField: 5
+  <BranchMultiplicator>k__BackingField: 2
+  <BranchDirectionWeight>k__BackingField: 1

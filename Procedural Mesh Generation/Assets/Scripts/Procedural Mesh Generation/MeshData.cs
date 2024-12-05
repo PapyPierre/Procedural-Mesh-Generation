@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Procedural_Mesh_Generation
 {
@@ -13,7 +14,9 @@ namespace Procedural_Mesh_Generation
         public List<Floor> Floors = new List<Floor>();
         public List<int> Triangles = new List<int>();
 
-        public Vector3 CenterVertex;
+        public int DeepestIndex = 0;
+
+        [FormerlySerializedAs("CenterVertex")] public Vector3 GenerationPoint;
         public Vector3 PivotVertex;
 
         public Floor GetPreviousFloor(Floor currentFloor) => Floors[currentFloor.PreviousFloorIndex];

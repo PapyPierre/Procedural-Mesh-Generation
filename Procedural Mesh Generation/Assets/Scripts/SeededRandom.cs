@@ -9,7 +9,7 @@ public static class SRnd
     const uint bitNoise1 = 0x68E31D14;
     const uint bitNoise2 = 0xB5287A4D;
     const uint bitNoise3 = 0x1B56C4E9;
-
+    
     public static void SetSeed(uint newSeed)
     {
         position = 0;

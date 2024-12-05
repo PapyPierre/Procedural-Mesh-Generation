@@ -280,7 +280,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GeneratedObjToDebug: []
   m_hideAllGizmos: 0
-  m_showSpine: 1
+  m_showSpine: 0
   m_showFloorsRadius: 0
   m_floorColorGradient:
     serializedVersion: 2
