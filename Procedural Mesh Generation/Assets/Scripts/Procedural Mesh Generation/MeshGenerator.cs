@@ -183,7 +183,6 @@ namespace Procedural_Mesh_Generation
             floor.AnchorPos = new Vector3(randomPos.x, y, randomPos.z);
         }
 
-
         private static void SetFloorRadius(MeshData meshData, Floor floor, float tempRadius)
         {
             float t = (float)floor.DepthIndex / meshData.Floors.Count;
@@ -227,12 +226,12 @@ namespace Procedural_Mesh_Generation
                         (previousFloor.AnchorPos - meshData.Floors[previousFloor.PreviousFloorIndex].AnchorPos)
                         .normalized;
 
-                    xOffset = branchDir.x * meshData.GenData.BranchDirMultiplicator;
-                    zOffset = branchDir.z + meshData.GenData.BranchDirMultiplicator;
+                    xOffset = previousFloor.AnchorPos.x + branchDir.x * meshData.GenData.BranchDirMultiplicator;
+                    zOffset = previousFloor.AnchorPos.z + branchDir.z * meshData.GenData.BranchDirMultiplicator;
                 }
             }
 
-            if (currentFloor.BranchIndex == 0 || currentFloor.IndexInBranch == 0)
+            if (currentFloor.IndexInBranch == 0)
             {
                 xOffset += SRnd.RangeFloat(-randomOffsetValue, randomOffsetValue);
                 zOffset += SRnd.RangeFloat(-randomOffsetValue, randomOffsetValue);
@@ -326,7 +325,6 @@ namespace Procedural_Mesh_Generation
                 }
             }
         }
-
 
         protected static Mesh CreateMesh(MeshData data)
         {

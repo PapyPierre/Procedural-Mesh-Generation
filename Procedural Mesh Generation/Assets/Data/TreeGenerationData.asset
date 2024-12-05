@@ -16,13 +16,13 @@ MonoBehaviour:
   <MeshName>k__BackingField: Generated Tree Mesh
   <Material>k__BackingField: {fileID: 2100000, guid: 2da28f8a4b1047b40bd80612c7a9ed3a,
     type: 2}
-  <MinFloorCount>k__BackingField: 20
-  <MaxFloorCount>k__BackingField: 40
+  <MinFloorCount>k__BackingField: 60
+  <MaxFloorCount>k__BackingField: 100
   <MinFloorsHeight>k__BackingField: 1
   <MaxFloorsHeight>k__BackingField: 2
   <HeightBetweenCenterAndFirstFloor>k__BackingField: 0
-  <MinFloorsRadius>k__BackingField: 0.2
-  <MaxFloorsRadius>k__BackingField: 0.6
+  <MinFloorsRadius>k__BackingField: 0.1
+  <MaxFloorsRadius>k__BackingField: 0.4
   <FloorsOffsetAlongVerticalAxis>k__BackingField:
     serializedVersion: 2
     m_Curve:
@@ -47,7 +47,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  <FloorsOffesetImpact>k__BackingField: 50
+  <FloorsOffesetImpact>k__BackingField: 10
   <VerticesMaxOffset>k__BackingField: 0
   <SwellingAlongVerticalAxis>k__BackingField:
     serializedVersion: 2
@@ -73,16 +73,16 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  <SwellingImpact>k__BackingField: 4.2
+  <SwellingImpact>k__BackingField: 2
   <RandomSwellingChance>k__BackingField: 0
   <MinRandomSwelling>k__BackingField: 0.01
   <MaxRandomSwelling>k__BackingField: 0.07
   <MeshComplexity>k__BackingField: 10
-  <MaxNumberOfBranches>k__BackingField: 3
+  <MaxNumberOfBranches>k__BackingField: 0
   <MinFloorCountInBranch>k__BackingField: 5
   <MaxFloorCountInBranch>k__BackingField: 8
   <BranchMultiplicator>k__BackingField: 2
-  <BranchDirMultiplicator>k__BackingField: 10
+  <BranchDirMultiplicator>k__BackingField: 4
   <BranchProba>k__BackingField:
     serializedVersion: 2
     m_Curve:

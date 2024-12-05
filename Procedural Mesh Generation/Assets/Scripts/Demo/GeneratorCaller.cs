@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using NaughtyAttributes;
+﻿using NaughtyAttributes;
 using Procedural_Mesh_Generation.Island_Generation;
 using Procedural_Mesh_Generation.Tree_Generation;
 using UnityEngine;
@@ -15,17 +14,19 @@ namespace Demo
 
         [SerializeField] private bool testIsland;
         [SerializeField] private bool testTree;
-        
+
         [Button]
         private void Generate()
         {
+            if (!Application.isPlaying) return;
+
             foreach (var obj in Debuger.Instance.GeneratedObjToDebug)
             {
                 Destroy(obj.gameObject);
             }
-            
+
             Debuger.Instance.GeneratedObjToDebug.Clear();
-            
+
             if (testIsland)
             {
                 GeneratedIsland island = IslandMeshGenerator.GenerateIsland(m_generateAt, m_islandGenerationData);
